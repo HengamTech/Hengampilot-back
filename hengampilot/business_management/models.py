@@ -13,7 +13,8 @@ class Business(models.Model):
         blank=True,
     )
     business_name = models.CharField(max_length=100, null=False, blank=False)
-    description = models.TextChoices(null=False, blank=False)
+    description = models.TextField(null=False, blank=False)
     website_url = models.CharField(max_length=50, null=True, blank=True)
+    average_rank = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
