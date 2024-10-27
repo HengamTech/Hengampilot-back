@@ -1,0 +1,5 @@
+If you haven't already, install the pre-commit hooks:
+>>> pre-commit install
+
+You can also run pre-commit on all files to format them immediately:
+>>> pre-commit run --all-files
