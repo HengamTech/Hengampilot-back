@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "review_rating",
     "user_management",
     "business_management",
+    "analytics"
 ]
 
 MIDDLEWARE = [
