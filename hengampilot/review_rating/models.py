@@ -1,3 +1,12 @@
 from django.db import models
 
-# Create your models here.
+
+class Review(models.Model):
+    pass
+
+class Vote(models.Model):
+    pass
+
+class ReviewResponse(models.Model):
+    pass
+

@@ -19,7 +19,7 @@ class FeatureRequest(models.Model):
         null=False,
         blank=True,
     )
-    description = models.TextChoices(null=False, blank=False)
+    description = models.TextField(null=False, blank=False)
     status = models.CharField(
         max_length=20,
         choices=[(tag.value, tag.name) for tag in JobStatus],

@@ -1,6 +1,13 @@
 from django.db import models
 import uuid
 from user_management.models import User
+from enum import Enum
+
+
+class StatusCategory(Enum):
+    GOLDEN = "golden"
+    SILVER = "silver"
+    TAN = "tan"
 
 
 class Business(models.Model):
@@ -11,6 +18,11 @@ class Business(models.Model):
         related_name="business_owner",
         null=False,
         blank=True,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[(tag.value, tag.name) for tag in StatusCategory],
+        default=StatusCategory.TAN.value,
     )
     business_name = models.CharField(max_length=100, null=False, blank=False)
     description = models.TextField(null=False, blank=False)
