@@ -16,8 +16,20 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "user_management/", include("user_management.urls", namespace="user_management")
+    ),
+    path(
+        "business_management/",
+        include("business_management.urls", namespace="business_management"),
+    ),
+    path(
+        "platform_management/",
+        include("platform_management.urls", namespace="platform_management"),
+    ),
+    path("review_rating/", include("review_rating.urls", namespace="review_rating")),
 ]
