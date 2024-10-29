@@ -30,7 +30,7 @@ class Review(models.Model):
         default=3,
     )
     review_text = models.TextField()
-    hidden = models.BooleanField(default=0)
+    hidden = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
