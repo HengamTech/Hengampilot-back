@@ -2,7 +2,7 @@ from django.db import models
 import uuid
 from user_management.models import User
 from enum import Enum
-
+from user_management.models import User
 
 class StatusCategory(Enum):
     GOLDEN = "golden"
@@ -13,7 +13,7 @@ class StatusCategory(Enum):
 class Business(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     business_owner = models.ForeignKey(
-        "User",
+        User,
         on_delete=models.CASCADE,
         related_name="business_owner",
         null=False,

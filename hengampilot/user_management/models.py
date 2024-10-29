@@ -10,7 +10,7 @@ from .managers import UserMnagers
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=30, unique=True)
-    username = models.CharField(max_length=50)
+    username = models.CharField(max_length=50,unique=True)
     hidden = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
@@ -39,7 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Notifications(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user_id = models.ForeignKey("User",on_delete=models.CASCADE,related_name="user_notifications",null=False,blank=False)
+    user_notifications = models.ForeignKey("User",on_delete=models.CASCADE,related_name="user_notifications",null=False,blank=False)
     is_read = models.BooleanField(default=False)
     notofication_text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)

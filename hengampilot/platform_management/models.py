@@ -2,7 +2,7 @@ from django.db import models
 import uuid
 from user_management.models import User
 from enum import Enum
-
+from user_management.models import User
 
 class JobStatus(Enum):
     PENDING = "pending"
@@ -13,9 +13,9 @@ class JobStatus(Enum):
 class FeatureRequest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
-        "User",
+        User,
         on_delete=models.CASCADE,
-        related_name="business_owner",
+        related_name="user_request",
         null=False,
         blank=True,
     )

@@ -1,14 +1,14 @@
 from django.db import models
 import uuid
-
+from user_management.models import User
 
 class Review(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
-        "User", on_delete=models.CASCADE, related_name="user_review"
+        User, on_delete=models.CASCADE, related_name="user_review"
     )
     business_id = models.ForeignKey(
-        "Business", on_delete=models.CASCADE, related_name="review_business"
+        "business_management.Business", on_delete=models.CASCADE, related_name="review_business"
     )
     rank = models.IntegerField(
         choices=[
@@ -28,7 +28,7 @@ class Review(models.Model):
 
 class Vote(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="user_vote")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_vote")
     review = models.ForeignKey(
         "Review", on_delete=models.CASCADE, related_name="review_vote"
     )
