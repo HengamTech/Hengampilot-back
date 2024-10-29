@@ -30,3 +30,8 @@ class Business(models.Model):
     average_rank = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+
+    def __str__(self):
+        return f"{self.business_name} - {self.website_url}"
