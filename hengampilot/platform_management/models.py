@@ -4,6 +4,7 @@ from user_management.models import User
 from enum import Enum
 from user_management.models import User
 
+
 class JobStatus(Enum):
     PENDING = "pending"
     APPROVED = "approved"
@@ -26,4 +27,5 @@ class FeatureRequest(models.Model):
         default=JobStatus.PENDING.value,
     )
 
-    
+    def __str__(self):
+        return f"{self.user} - {self.status}"
