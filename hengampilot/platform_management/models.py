@@ -2,6 +2,7 @@ from django.db import models
 import uuid
 from user_management.models import User
 from enum import Enum
+from user_management.models import User
 
 
 class JobStatus(Enum):
@@ -13,9 +14,9 @@ class JobStatus(Enum):
 class FeatureRequest(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(
-        "User",
+        User,
         on_delete=models.CASCADE,
-        related_name="business_owner",
+        related_name="user_request",
         null=False,
         blank=True,
     )
@@ -26,4 +27,5 @@ class FeatureRequest(models.Model):
         default=JobStatus.PENDING.value,
     )
 
-    
+    def __str__(self):
+        return f"{self.user} - {self.status}"

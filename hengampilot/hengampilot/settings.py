@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-3(ifs4sauefpcigmtxx6#ly1f)iyiltik$c@@@3az4p@2qahsv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -37,11 +37,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "platform_management",
-    "review_rating",
     "user_management",
     "business_management",
-    "analytics"
+    "review_rating",
+    "platform_management",
+    "analytics",
 ]
 
 MIDDLEWARE = [
@@ -115,7 +115,9 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+# Authentication
 
+AUTH_USER_MODEL = "user_management.User"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
