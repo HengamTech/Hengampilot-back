@@ -1,6 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import BusinessViewSet
 
-app_name = "business_management"
+app_name = 'business_management'
 
+router = DefaultRouter()
+router.register(r'businesses', BusinessViewSet)
 
-urlpatterns = []
+urlpatterns = [
+    path('', include(router.urls)),
+]

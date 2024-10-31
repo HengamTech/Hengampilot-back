@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     "review_rating",
     "platform_management",
     "analytics",
+    'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +54,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'analytics.middleware.AuditLogMiddleware',
 ]
 
 ROOT_URLCONF = "hengampilot.urls"
@@ -74,6 +77,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "hengampilot.wsgi.application"
 
+# Authentication endpoints
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+AUTH_USER_MODEL = 'user_management.User'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

@@ -9,7 +9,6 @@ class StatusCategory(Enum):
     SILVER = "silver"
     TAN = "tan"
 
-
 class Business(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     business_owner = models.ForeignKey(
@@ -31,7 +30,28 @@ class Business(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
-
     def __str__(self):
         return f"{self.business_name} - {self.website_url}"
+    
+class SubscriptionType(Enum):
+    FREE = "free"
+    PREMIUM = "premium"
+
+class Subscription(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    business = models.ForeignKey(
+        Business,
+        on_delete=models.CASCADE,
+        related_name='subscriptions'
+    )
+    type = models.CharField(
+        max_length=20,
+        choices=[(tag.value, tag.name) for tag in SubscriptionType],
+        default=SubscriptionType.FREE.value
+    )
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.business.business_name} - {self.type}"
