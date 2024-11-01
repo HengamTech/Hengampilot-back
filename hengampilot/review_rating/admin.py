@@ -32,12 +32,12 @@ class ReportsAdmin(admin.ModelAdmin):
     list_display = [
         "review_id",
         "review_user_id",
-        "reson_select",
+        "reason_select",
         "reason",
         "create_at",
     ]
-    list_filter = ["reson_select", "review_id", "review_user_id", "create_at"]
-    search_fields = ["review_user_id", "review_id", "reson_select"]
+    list_filter = ["reason_select", "review_id", "review_user_id", "create_at"]
+    search_fields = ["review_user_id", "review_id", "reason_select"]
 
 
 admin.site.register(Review, ReviewAdmin)

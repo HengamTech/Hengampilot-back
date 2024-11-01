@@ -27,10 +27,8 @@ urlpatterns = [
         "business_management/",
         include("business_management.urls", namespace="business_management"),
     ),
-    path(
-        "platform_management/",
-        include("platform_management.urls", namespace="platform_management"),
-    ),
+    path('platform/', include(('platform_management.urls', 'platform_management'))),
+
     path("review_rating/", include("review_rating.urls", namespace="review_rating")),
         path("analytics/", include("analytics.urls", namespace="analytics")),
 

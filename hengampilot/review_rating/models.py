@@ -70,7 +70,7 @@ class Reports(models.Model):
     review_user_id = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_report"
     )
-    reson_select = models.CharField(
+    reason_select = models.CharField(
         max_length=20,
         choices=[(tag.value, tag.name) for tag in ReasonReport],
         null=False,
@@ -80,4 +80,4 @@ class Reports(models.Model):
     create_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.review_id}-{self.reson_select}"
+        return f"{self.review_id}-{self.reason_select}"

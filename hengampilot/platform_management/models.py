@@ -23,7 +23,7 @@ class FeatureRequest(models.Model):
     description = models.TextField(null=False, blank=False)
     status = models.CharField(
         max_length=20,
-        choices=[(tag.value, tag.name) for tag in JobStatus],
+        choices=[(tag.value, tag.name) for tag in JobStatus], # choices=[(tag.value, tag.name.capitalize()) for tag in JobStatus]
         default=JobStatus.PENDING.value,
     )
 

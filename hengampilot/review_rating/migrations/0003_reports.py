@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "reson_select",
+                    "resson_select",
                     models.CharField(
                         choices=[
                             ("sexual", "SEXUAL"),
