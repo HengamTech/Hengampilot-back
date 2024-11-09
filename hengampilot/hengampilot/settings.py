@@ -110,6 +110,12 @@ DATABASES = {
 }
 
 
+SPECTACULAR_SETTINGS = {
+    "TITLE": "API Documentation",
+    "DESCRIPTION": "Hengam pilot",
+    "VERSION": "1.2.1",
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
