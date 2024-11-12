@@ -4,10 +4,6 @@ from user_management.models import User
 from enum import Enum
 from user_management.models import User
 
-class StatusCategory(Enum):
-    GOLDEN = "golden"
-    SILVER = "silver"
-    TAN = "tan"
 
 class Business(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -18,11 +14,7 @@ class Business(models.Model):
         null=False,
         blank=False,
     )
-    status = models.CharField(
-        max_length=20,
-        choices=[(tag.value, tag.name) for tag in StatusCategory],
-        default=StatusCategory.TAN.value,
-    )
+
     business_name = models.CharField(max_length=100, null=False, blank=False)
     description = models.TextField(null=False, blank=False)
     website_url = models.CharField(max_length=50, null=True, blank=True)

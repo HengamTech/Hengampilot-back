@@ -3,15 +3,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Business, StatusCategory
-from .serializers import BusinessSerializer, BusinessCreateSerializer, BusinessUpdateSerializer
+from .models import Business, Subscription
+from .serializers import BusinessSerializer, BusinessCreateSerializer, BusinessUpdateSerializer,SubscriptionSerializer
 
 class BusinessViewSet(viewsets.ModelViewSet):
     queryset = Business.objects.all()
     serializer_class = BusinessSerializer
     
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['status']
+    
     search_fields = ['business_name', 'description']
     ordering_fields = ['created_at', 'average_rank']
 
@@ -28,30 +28,37 @@ class BusinessViewSet(viewsets.ModelViewSet):
             average_rank=0
         )
 
-    @action(detail=True, methods=['post'])
-    def update_status(self, request, pk=None):
-        if not request.user.is_admin:
-            return Response(
-                {'error': 'Only admins can update status'},
-                status=status.HTTP_403_FORBIDDEN
-            )
+    # @action(detail=True, methods=['post'])
+    # def update_status(self, request, pk=None):
+    #     if not request.user.is_admin:
+    #         return Response(
+    #             {'error': 'Only admins can update status'},
+    #             status=status.HTTP_403_FORBIDDEN
+    #         )
         
-        business = self.get_object()
-        new_status = request.data.get('status')
+    #     business = self.get_object()
+    #     new_status = request.data.get('status')
         
-        if new_status not in [status.value for status in StatusCategory]:
-            return Response(
-                {'error': 'Invalid status'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+    #     if new_status not in [status.value for status in StatusCategory]:
+    #         return Response(
+    #             {'error': 'Invalid status'},
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
 
-        business.status = new_status
-        business.save()
+    #     business.status = new_status
+    #     business.save()
         
-        return Response(BusinessSerializer(business).data)
+    #     return Response(BusinessSerializer(business).data)
 
     @action(detail=False, methods=['get'])
     def my_businesses(self, request):
         businesses = self.queryset.filter(business_owner=request.user)
         serializer = self.get_serializer(businesses, many=True)
         return Response(serializer.data)
+    
+
+
+
+class SubscriptionVeiw(viewsets.ModelViewSet):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer

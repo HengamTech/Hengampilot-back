@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Business
+from .models import Business, Subscription
 from review_rating.models import Review
 
 
@@ -10,7 +10,10 @@ class BusinessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
         fields = "__all__"
-        read_only_fields = ("business_owner", "average_rank", "status")
+        read_only_fields = (
+            "business_owner",
+            "average_rank",
+        )
 
     def get_average_rating(self, obj):
         reviews = Review.objects.filter(business_id=obj)
@@ -27,7 +30,6 @@ class BusinessCreateSerializer(serializers.ModelSerializer):
         model = Business
         fields = (
             "business_owner",
-            "status",
             "business_name",
             "description",
             "website_url",
@@ -39,8 +41,13 @@ class BusinessUpdateSerializer(serializers.ModelSerializer):
         model = Business
         fields = (
             "business_owner",
-            "status",
             "business_name",
             "description",
             "website_url",
         )
+
+
+class SubscriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscription
+        fields = "__all__"
