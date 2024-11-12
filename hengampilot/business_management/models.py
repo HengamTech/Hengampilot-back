@@ -16,7 +16,7 @@ class Business(models.Model):
         on_delete=models.CASCADE,
         related_name="business_owner",
         null=False,
-        blank=True,
+        blank=False,
     )
     status = models.CharField(
         max_length=20,
