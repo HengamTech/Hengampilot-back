@@ -28,9 +28,9 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user_notifications=self.request.user)
 
-    @action(detail=True, methods=['post'])
-    def mark_as_read(self, request, pk=None):
-        notification = self.get_object()
-        notification.is_read = True
-        notification.save()
-        return Response({'status': 'notification marked as read'})
+    # @action(detail=True, methods=['post'])
+    # def mark_as_read(self, request, pk=None):
+    #     notification = self.get_object()
+    #     notification.is_read = True
+    #     notification.save()
+    #     return Response({'status': 'notification marked as read'})
