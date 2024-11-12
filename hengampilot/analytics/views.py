@@ -11,3 +11,6 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['action_type', 'content_type', 'user']
     search_fields = ['changes']
+
+
+
