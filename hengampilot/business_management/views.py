@@ -9,7 +9,7 @@ from .serializers import BusinessSerializer, BusinessCreateSerializer, BusinessU
 class BusinessViewSet(viewsets.ModelViewSet):
     queryset = Business.objects.all()
     serializer_class = BusinessSerializer
-    
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
     search_fields = ['business_name', 'description']
@@ -62,3 +62,4 @@ class BusinessViewSet(viewsets.ModelViewSet):
 class SubscriptionVeiw(viewsets.ModelViewSet):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
+    permission_classes = [IsAuthenticated]
