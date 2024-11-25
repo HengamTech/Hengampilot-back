@@ -129,11 +129,11 @@ AUTH_USER_MODEL = "user_management.User"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "hengam",
+        "NAME": "postgres",
         "USER": "username",
         "PASSWORD": 1234,
         "HOST": "127.0.0.1",
-        "PORT": 5434,
+        "PORT": 5433,
     }
 }
 
