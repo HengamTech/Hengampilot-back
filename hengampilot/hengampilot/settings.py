@@ -67,7 +67,6 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = [
     "content-type",
     "authorization",
-
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -130,11 +129,11 @@ AUTH_USER_MODEL = "user_management.User"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "hengam",
-        "USER": "mohammad",
+        "NAME": "postgres",
+        "USER": "username",
         "PASSWORD": 1234,
         "HOST": "127.0.0.1",
-        "PORT": 5434,
+        "PORT": 5433,
     }
 }
 
