@@ -3,6 +3,7 @@ import uuid
 from user_management.models import User
 from enum import Enum
 from user_management.models import User
+from django.core.exceptions import ValidationError
 
 
 class JobStatus(Enum):
@@ -18,14 +19,20 @@ class FeatureRequest(models.Model):
         on_delete=models.CASCADE,
         related_name="user_request",
         null=False,
-        blank=True,
+        blank=False,
     )
     description = models.TextField(null=False, blank=False)
     status = models.CharField(
         max_length=20,
-        choices=[(tag.value, tag.name) for tag in JobStatus], # choices=[(tag.value, tag.name.capitalize()) for tag in JobStatus]
+        choices=[
+            (tag.value, tag.name) for tag in JobStatus
+        ],  # choices=[(tag.value, tag.name.capitalize()) for tag in JobStatus]
         default=JobStatus.PENDING.value,
     )
 
     def __str__(self):
         return f"{self.user} - {self.status}"
+
+    def clean(self):
+        if not self.description:
+            raise ValidationError("Description cannot be empty.")
