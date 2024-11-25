@@ -67,6 +67,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = [
     "content-type",
     "authorization",
+
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -107,7 +108,7 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=50000000),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -129,11 +130,11 @@ AUTH_USER_MODEL = "user_management.User"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "username",
+        "NAME": "hengam",
+        "USER": "mohammad",
         "PASSWORD": 1234,
         "HOST": "127.0.0.1",
-        "PORT": 5433,
+        "PORT": 5434,
     }
 }
 
@@ -186,3 +187,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+APPEND_SLASH = False
