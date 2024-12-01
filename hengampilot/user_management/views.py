@@ -6,20 +6,22 @@ from rest_framework.response import Response
 from .models import User, Notifications
 from .serializers import UserSerializer, NotificationSerializer
 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
-    
+
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action == "create":
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()
