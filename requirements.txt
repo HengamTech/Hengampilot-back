@@ -1,4 +1,0 @@
-pre-commit
-djangorestframework
-djangorestframework-simplejwt
-drf_spectacular
