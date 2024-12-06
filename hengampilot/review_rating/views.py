@@ -1,24 +1,81 @@
 from rest_framework import viewsets
 from .models import Review, Vote, Reports, ReviewResponse
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from .serializers import (
-    ReviewSerializer, 
-    VoteSerializer, 
-    ReportsSerializer, 
-    ReviewResponseSerializer
+    ReviewSerializer,
+    VoteSerializer,
+    ReportsSerializer,
+    ReviewResponseSerializer,
 )
+from rest_framework import status
 
+from rest_framework.permissions import IsAuthenticated
+from .tasks import add_review_view, add_report_view
+
+
+# ViewSet for handling reviews
 class ReviewViewSet(viewsets.ModelViewSet):
+    # Set the queryset for the viewset
     queryset = Review.objects.all()
+    # Specify the serializer to be used
     serializer_class = ReviewSerializer
+    # Set permission class to ensure only authenticated users can access the viewset
+    permission_classes = [IsAuthenticated]
 
+    # Custom action for adding a review (this triggers a background task)
+    @action(detail=False, methods=["post"])
+    def add_review(self, request):
+        # Extract review data from the request
+        review_data = request.data
+        # Trigger the background task to process the review addition
+        add_review_view.apply_async(args=[review_data])
+        # Respond with an accepted status code indicating that the task has been initiated
+        return Response(
+            {"message": "Review addition task initiated successfully"},
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+
+# ViewSet for handling votes
 class VoteViewSet(viewsets.ModelViewSet):
+    # Set the queryset for the viewset
     queryset = Vote.objects.all()
+    # Specify the serializer to be used
     serializer_class = VoteSerializer
+    # Set permission class to ensure only authenticated users can access the viewset
+    permission_classes = [IsAuthenticated]
 
+
+# ViewSet for handling reports
 class ReportsViewSet(viewsets.ModelViewSet):
+    # Set the queryset for the viewset
     queryset = Reports.objects.all()
+    # Specify the serializer to be used
     serializer_class = ReportsSerializer
+    # Set permission class to ensure only authenticated users can access the viewset
+    permission_classes = [IsAuthenticated]
 
+    # Custom action for adding a report (this triggers a background task)
+    @action(detail=False, methods=["post"])
+    def add_report(self, request):
+        # Extract report data from the request
+        report_data = request.data
+        # Trigger the background task to process the report creation
+        add_report_view.apply_async(args=[report_data])
+        # Respond with an accepted status code indicating that the task has been initiated
+        return Response(
+            {"message": "Report creation task initiated successfully"},
+            status=status.HTTP_202_ACCEPTED,
+        )
+
+
+# ViewSet for handling review responses
 class ReviewResponseViewSet(viewsets.ModelViewSet):
+    # Set the queryset for the viewset
     queryset = ReviewResponse.objects.all()
+    # Specify the serializer to be used
     serializer_class = ReviewResponseSerializer
+    # Set permission class to ensure only authenticated users can access the viewset
+    permission_classes = [IsAuthenticated]
