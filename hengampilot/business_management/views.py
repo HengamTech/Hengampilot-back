@@ -10,7 +10,7 @@ from .serializers import (
     BusinessUpdateSerializer,
     SubscriptionSerializer,
 )
-from .tasks import create_subscription, deactivate_subscription
+from .tasks import manage_subscription
 
 
 # ViewSet for managing Business operations (CRUD)
