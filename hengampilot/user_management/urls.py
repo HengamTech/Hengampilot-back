@@ -8,6 +8,8 @@ app_name = "user_management"
 # Create a router for automatic URL routing
 router = DefaultRouter()
 
+
+
 # Register the UserViewSet with the router
 # This will automatically create routes for the User model's CRUD operations
 router.register(r"users", UserViewSet, basename="url_user_view")
