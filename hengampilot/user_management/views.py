@@ -6,19 +6,35 @@ from rest_framework.response import Response
 from .models import User, Notifications
 from .serializers import UserSerializer, NotificationSerializer
 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     def get_permissions(self):
-        if self.action == 'create':
+        if self.action == "create":
             return [AllowAny()]
         return [IsAuthenticated()]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"], url_path='fetch-by-username') 
+    def fetch_by_username(self, request): 
+        username = request.query_params.get('username', None) 
+        if username is not None: 
+            try: 
+                user = User.objects.get(username=username) 
+                serializer = UserSerializer(user) 
+                return Response(serializer.data, status=status.HTTP_200_OK) 
+            except User.DoesNotExist: 
+                return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND) 
+        else: 
+            return Response({"detail": "Username query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["get"])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()
@@ -28,9 +44,9 @@ class NotificationViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return self.queryset.filter(user_notifications=self.request.user)
 
-    @action(detail=True, methods=['post'])
-    def mark_as_read(self, request, pk=None):
-        notification = self.get_object()
-        notification.is_read = True
-        notification.save()
-        return Response({'status': 'notification marked as read'})
+    # @action(detail=True, methods=['post'])
+    # def mark_as_read(self, request, pk=None):
+    #     notification = self.get_object()
+    #     notification.is_read = True
+    #     notification.save()
+    #     return Response({'status': 'notification marked as read'})
