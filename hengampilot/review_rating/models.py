@@ -106,7 +106,7 @@ class Reports(models.Model):
         User, on_delete=models.CASCADE, related_name="user_report"
     )  # User who is reporting.
     reason_select = models.CharField(
-        max_length=20,
+        max_length=256,
         choices=[
             (tag.value, tag.name) for tag in ReasonReport
         ],  # Choices for the reason of the report (from ReasonReport Enum).
@@ -114,7 +114,7 @@ class Reports(models.Model):
         blank=False,
     )
     result_report = models.CharField(
-        max_length=20,
+        max_length=256,
         choices=[
             (tag.value, tag.name) for tag in ResultReport
         ],  # Choices for the result of the report (from ResultReport Enum).

@@ -1,97 +1,88 @@
-from rest_framework.test import APITestCase
-from rest_framework import status
-from django.urls import reverse
-from .models import User, Notifications
-from rest_framework.test import APIClient
+from django.db import models
+import uuid
+from django.db import models
+from django.contrib.auth.models import PermissionsMixin, AbstractBaseUser, AbstractUser
 
-class UserViewSetTest(APITestCase):
-
-    def setUp(self):
-        # Set up a user and an API client
-        self.client = APIClient()
-        self.user_data = {
-            "email": "testuser@example.com",
-            "username": "testuser",
-            "password": "securepassword"
-        }
-        self.user = User.objects.create_user(**self.user_data)
-
-    def test_create_user(self):
-        url = reverse('user-list')  # Assuming you have a 'user-list' URL in your routing
-        data = {
-            "email": "newuser@example.com",
-            "username": "newuser",
-            "password": "newpassword"
-        }
-        response = self.client.post(url, data, format='json')
-
-        # Check that the response status code is 201 Created
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(User.objects.count(), 2)  # One user should be created
-
-    def test_fetch_user_by_username_success(self):
-        url = reverse('user-fetch-by-username') + '?username=testuser'
-        response = self.client.get(url)
-
-        # Check that the response status code is 200 OK and returns the correct user data
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], self.user.username)
-
-    def test_fetch_user_by_username_not_found(self):
-        url = reverse('user-fetch-by-username') + '?username=nonexistentuser'
-        response = self.client.get(url)
-
-        # Check that the response status code is 404 Not Found
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-    def test_fetch_user_by_username_bad_request(self):
-        url = reverse('user-fetch-by-username')  # Missing the 'username' parameter
-        response = self.client.get(url)
-
-        # Check that the response status code is 400 Bad Request
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_me_endpoint(self):
-        self.client.force_authenticate(user=self.user)
-        url = reverse('user-me')  # Assuming you have a 'user-me' URL in your routing
-        response = self.client.get(url)
-
-        # Check that the response status code is 200 OK
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['username'], self.user.username)
+# Import custom manager for User model
+from .managers import UserMnagers
 
 
-class NotificationViewSetTest(APITestCase):
+# Custom User model that extends AbstractBaseUser and PermissionsMixin
+class User(AbstractBaseUser, PermissionsMixin):
+    # Unique identifier for the user (UUID)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    def setUp(self):
-        # Set up a user and a notification
-        self.client = APIClient()
-        self.user_data = {
-            "email": "testuser@example.com",
-            "username": "testuser",
-            "password": "securepassword"
-        }
-        self.user = User.objects.create_user(**self.user_data)
-        self.notification = Notifications.objects.create(
-            user_notifications=self.user,
-            notofication_text="Test notification",
-        )
+    # User's email address (must be unique)
+    email = models.EmailField(max_length=30, unique=True)
 
-    def test_get_notifications(self):
-        self.client.force_authenticate(user=self.user)
-        url = reverse('notification-list')  # Assuming you have a 'notification-list' URL
-        response = self.client.get(url)
+    # Username for the user (must be unique)
+    username = models.CharField(max_length=50, unique=True, help_text="Ehsan")
 
-        # Check that the response status code is 200 OK
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)  # One notification should be returned
+    # Whether the user is hidden or not
+    hidden = models.BooleanField(default=False)
 
-    def test_notification_is_read(self):
-        self.client.force_authenticate(user=self.user)
-        url = reverse('notification-detail', args=[str(self.notification.id)])  # Assuming you have a 'notification-detail' URL
-        response = self.client.patch(url, {'is_read': True})
+    # Whether the user account is active
+    is_active = models.BooleanField(default=True)
 
-        # Check that the response status code is 200 OK
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.notification.refresh_from_db()
-        self.assertTrue(self.notification.is_read)  # The notification should be marked as read
+    # Whether the user has admin privileges
+    is_admin = models.BooleanField(default=False)
+
+    # The timestamp when the user was created
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Whether the user is a superuser
+    is_superuser = models.BooleanField(default=False)
+
+    # Custom manager for user creation
+    objects = UserMnagers()
+
+    # Define the field used for authentication (username)
+    USERNAME_FIELD = "username"
+
+    # Fields required for user creation apart from the USERNAME_FIELD
+    REQUIRED_FIELDS = ["email"]
+
+    # String representation of the user (return email)
+    def __str__(self):
+        return self.email
+
+    # Check if the user has specific permission (only superuser has all permissions)
+    def has_perm(self, perm, obj=None):
+        return self.is_superuser
+
+    # Check if the user has permissions for a specific app (only superuser has module perms)
+    def has_module_perms(self, app_label):
+        return self.is_superuser
+
+    # Property to check if the user is a staff member (i.e. an admin user)
+    @property
+    def is_staff(self):
+        return self.is_admin
+
+
+# Notifications model for storing notifications for each user
+class Notifications(models.Model):
+    # Unique identifier for the notification (UUID)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    # ForeignKey relation to the User model (notification is associated with a user)
+    user_notifications = models.ForeignKey(
+        "User",
+        on_delete=models.CASCADE,
+        related_name="user_notifications",
+        null=False,
+        blank=False,
+    )
+
+    # Whether the notification has been read
+    is_read = models.BooleanField(default=False)
+
+    # Text content of the notification
+    notofication_text = models.TextField()
+
+    # Timestamp when the notification was created
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # String representation of the notification (show the user associated with it)
+    def __str__(self):
+        return f"{self.user_notifications}"

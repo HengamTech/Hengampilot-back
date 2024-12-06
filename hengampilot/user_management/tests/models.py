@@ -1,88 +1,134 @@
 from django.test import TestCase
+from user_management.models import User
 from django.db.utils import IntegrityError
-from user_management.models import User, Notifications
 
+class UserModelTest(TestCase):
 
-class UserModelTestCase(TestCase):
-    def setUp(self):
-        """ایجاد یک کاربر برای استفاده در تست‌ها"""
-        self.user = User.objects.create_user(
-            username="testuser",
-            email="testuser@example.com",
-            password="testpass123",
-            is_active=True  # افزودن is_active به هنگام ایجاد کاربر
-        )
     def test_create_user(self):
-        """تست ایجاد یک کاربر با مقدار صحیح"""
-        user = self.user
-        self.assertEqual(user.username, "testuser")
+        """Test creating a user with the custom manager"""
+        user = User.objects.create_user(
+            email="testuser@example.com",
+            username="testuser",
+            password="testpassword123",
+            is_active=True
+        )
         self.assertEqual(user.email, "testuser@example.com")
-        self.assertTrue(user.check_password("testpass123"))
-        self.assertFalse(user.hidden)
+        self.assertEqual(user.username, "testuser")
+        self.assertTrue(user.check_password("testpassword123"))
         self.assertTrue(user.is_active)
+        self.assertFalse(user.is_admin)
 
-    def test_user_str_method(self):
-        """تست متد __str__ برای User"""
-        user = self.user
-        self.assertEqual(str(user), "testuser@example.com")
+    def test_create_superuser(self):
+        """Test creating a superuser with the custom manager"""
+        superuser = User.objects.create_superuser(
+            email="admin@example.com",
+            username="admin",
+            password="adminpassword123"
+        )
+        self.assertEqual(superuser.email, "admin@example.com")
+        self.assertEqual(superuser.username, "admin")
+        self.assertTrue(superuser.check_password("adminpassword123"))
+        self.assertTrue(superuser.is_admin)
+        self.assertTrue(superuser.is_superuser)
 
-    def test_create_user_without_username(self):
-        """تست ایجاد کاربر بدون نام کاربری که باید خطا دهد"""
+    def test_create_user_with_missing_email(self):
+        """Test that creating a user without email raises a ValueError"""
+        with self.assertRaises(ValueError):
+            User.objects.create_user(
+                email="",
+                username="testuser",
+                password="testpassword123",
+                is_active=True
+            )
+
+    def test_create_user_with_missing_username(self):
+        """Test that creating a user without username raises a ValueError"""
         with self.assertRaises(ValueError):
             User.objects.create_user(
                 email="testuser@example.com",
-                password="testpass123"
+                username="",
+                password="testpassword123",
+                is_active=True
             )
 
-    def test_user_permissions(self):
-        """تست بررسی دسترسی‌ها و مجوزها برای کاربر"""
-        user = self.user
-        self.assertTrue(user.has_perm("some_permission"))  # کاربر باید دسترسی سوپر یوزر داشته باشد
-        self.assertTrue(user.has_module_perms("some_app"))
+    def test_str_method(self):
+        """Test the string representation of the user"""
+        user = User.objects.create_user(
+            email="testuser@example.com",
+            username="testuser",
+            password="testpassword123",
+            is_active=True
+        )
+        self.assertEqual(str(user), "testuser@example.com")
 
-    def test_is_staff_property(self):
-        """تست ویژگی is_staff"""
-        user = self.user
-        self.assertFalse(user.is_staff)  # چون is_admin در حال حاضر False است
+    def test_permissions(self):
+        """Test user permissions based on is_superuser and is_admin"""
+        user = User.objects.create_user(
+            email="testuser@example.com",
+            username="testuser",
+            password="testpassword123",
+            is_active=True
+        )
+        self.assertFalse(user.has_perm("can_edit"))
+        self.assertFalse(user.has_module_perms("app_name"))
 
-
-# class NotificationsModelTestCase(TestCase):
-#     def setUp(self):
-#         """ایجاد یک کاربر و یک نوتیفیکیشن برای استفاده در تست‌ها"""
-#         self.user = User.objects.create_user(
-#             username="testuser",
-#             email="testuser@example.com",
-#             password="testpass123"
-#         )
-#         self.notification = Notifications.objects.create(
-#             user_notifications=self.user,
-#             notofication_text="This is a test notification",
-#         )
-
-#     def test_create_notification(self):
-#         """تست ایجاد یک نوتیفیکیشن با مقدار صحیح"""
-#         notification = self.notification
-#         self.assertEqual(notification.user_notifications, self.user)
-#         self.assertEqual(notification.notofication_text, "This is a test notification")
-#         self.assertFalse(notification.is_read)
-
-#     def test_notification_str_method(self):
-#         """تست متد __str__ برای Notification"""
-#         notification = self.notification
-#         self.assertEqual(str(notification), f"{self.user}")
-
-#     def test_notification_without_user(self):
-#         """تست ایجاد نوتیفیکیشن بدون کاربر که باید خطا دهد"""
-#         with self.assertRaises(IntegrityError):
-#             Notifications.objects.create(
-#                 notofication_text="This notification has no user"
-#             )
-
-#     def test_notification_with_read_flag(self):
-#         """تست تغییر وضعیت is_read برای نوتیفیکیشن"""
-#         notification = self.notification
-#         notification.is_read = True
-#         notification.save()
-#         self.assertTrue(notification.is_read)
+        superuser = User.objects.create_superuser(
+            email="admin@example.com",
+            username="admin",
+            password="adminpassword123"
+        )
+        self.assertTrue(superuser.has_perm("can_edit"))
+        self.assertTrue(superuser.has_module_perms("app_name"))
 
 
+from django.test import TestCase
+from user_management.models import User, Notifications
+import uuid
+from django.utils import timezone
+
+class NotificationsModelTest(TestCase):
+
+    def setUp(self):
+        """Create a user instance for testing"""
+        self.user = User.objects.create_user(
+            email="testuser@example.com",
+            username="testuser",
+            password="testpassword123",
+            is_active=True
+        )
+
+    def test_create_notification(self):
+        """Test creating a notification"""
+        notification = Notifications.objects.create(
+            user_notifications=self.user,
+            notofication_text="This is a test notification"
+        )
+        self.assertEqual(notification.user_notifications, self.user)
+        self.assertEqual(notification.notofication_text, "This is a test notification")
+        self.assertFalse(notification.is_read)  # Default should be False
+        self.assertIsInstance(notification.created_at, timezone.datetime)  # should be a DateTime
+
+    def test_str_method(self):
+        """Test the string representation of the notification"""
+        notification = Notifications.objects.create(
+            user_notifications=self.user,
+            notofication_text="Test notification"
+        )
+        self.assertEqual(str(notification), "testuser@example.com")  # This uses user_notifications' email field
+
+    def test_notification_is_read_default(self):
+        """Test that a newly created notification has is_read=False by default"""
+        notification = Notifications.objects.create(
+            user_notifications=self.user,
+            notofication_text="Test notification"
+        )
+        self.assertFalse(notification.is_read)
+
+    def test_foreign_key_relation(self):
+        """Test the ForeignKey relationship between Notifications and User"""
+        notification = Notifications.objects.create(
+            user_notifications=self.user,
+            notofication_text="Test notification"
+        )
+        self.assertEqual(notification.user_notifications, self.user)
+        self.assertEqual(self.user.user_notifications.count(), 1)
