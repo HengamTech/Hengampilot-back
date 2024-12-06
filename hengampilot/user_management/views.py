@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import User, Notifications
 from .serializers import UserSerializer, NotificationSerializer
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -17,7 +18,12 @@ class UserViewSet(viewsets.ModelViewSet):
             return [AllowAny()]
         return [IsAuthenticated()]
 
-
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('username', str, description='The username of the user you want to fetch.', required=True)
+        ],
+        responses={200: UserSerializer, 404: 'User not found', 400: 'Bad Request'}
+    )
     @action(detail=False, methods=["get"], url_path='fetch-by-username') 
     def fetch_by_username(self, request): 
         username = request.query_params.get('username', None) 
