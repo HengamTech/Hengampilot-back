@@ -1,61 +1,57 @@
-"""
-URL configuration for hengampilot project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-
 from django.contrib import admin
 from django.urls import path, include
-from django.urls import path
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
-
-from django.urls import path
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
 
-
 urlpatterns = [
+    # Admin panel URL
     path("admin/", admin.site.urls),
+
+    # URLs for user management (included from the user_management app)
     path(
         "user_management/", include("user_management.urls", namespace="user_management")
     ),
+
+    # URLs for business management (included from the business_management app)
     path(
         "business_management/",
         include("business_management.urls", namespace="business_management"),
     ),
+
+    # URLs for platform management (included from the platform_management app)
     path("platform/", include(("platform_management.urls", "platform_management"))),
+
+    # URLs for review and rating (included from the review_rating app)
     path("review_rating/", include("review_rating.urls", namespace="review_rating")),
+
+    # URLs for analytics (included from the analytics app)
     path("analytics/", include("analytics.urls", namespace="analytics")),
+
+    # API Schema generation endpoints
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    
+    # Swagger UI for API documentation
     path(
         "api/schema/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
+    
+    # ReDoc for API documentation
     path(
         "api/schema/redoc/",
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
+
+    # JWT authentication token endpoints
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]
-
-
