@@ -12,6 +12,13 @@ class ReasonReport(Enum):
     TERRORISM = "terrorism"  # Report reason for terrorism-related content.
 
 
+class ResultReport(Enum):
+    Ignore = "ignore"
+    Unchecked = "Unchecked"
+    Remove = "Remove"
+    User_Ban = "UserBan"
+
+
 # Model for a review on a business.
 class Review(models.Model):
     id = models.UUIDField(
@@ -105,6 +112,15 @@ class Reports(models.Model):
         ],  # Choices for the reason of the report (from ReasonReport Enum).
         null=False,
         blank=False,
+    )
+    result_report = models.CharField(
+        max_length=20,
+        choices=[
+            (tag.value, tag.name) for tag in ResultReport
+        ],  # Choices for the result of the report (from ResultReport Enum).
+        null=False,
+        blank=False,
+        default= ResultReport.Unchecked
     )
     reason = models.TextField()  # Description of why the review is being reported.
     create_at = models.DateTimeField(
