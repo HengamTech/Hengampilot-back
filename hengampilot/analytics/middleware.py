@@ -2,24 +2,29 @@ from django.utils.deprecation import MiddlewareMixin
 from django.contrib.contenttypes.models import ContentType
 from .models import AuditLog
 
-# create middleware for automatically log actions !
+# Create middleware for automatically logging actions
 class AuditLogMiddleware(MiddlewareMixin):
     def process_request(self, request):
+        # Add IP address and user agent data to the request object for use in logging
         request.audit_log_data = {
-            'ip_address': request.META.get('REMOTE_ADDR'),
-            'user_agent': request.META.get('HTTP_USER_AGENT'),
+            'ip_address': request.META.get('REMOTE_ADDR'),  # Get IP address from request metadata
+            'user_agent': request.META.get('HTTP_USER_AGENT'),  # Get user agent from request headers
         }
 
+# Helper function to log user actions into the AuditLog model
 def log_action(user, action_type, instance, changes=None):
     """
-    Helper function to log actions
+    Helper function to log actions such as create, update, or delete.
+    This function records details like the user, action type, model instance, changes, 
+    IP address, and user agent for auditing purposes.
     """
+    # Create an AuditLog entry with the provided details
     AuditLog.objects.create(
-        user=user,
-        action_type=action_type,
-        content_type=ContentType.objects.get_for_model(instance),
-        object_id=str(instance.pk),
-        changes=changes,
-        ip_address=getattr(user, 'audit_log_data', {}).get('ip_address'),
-        user_agent=getattr(user, 'audit_log_data', {}).get('user_agent'),
+        user=user,  # The user who performed the action
+        action_type=action_type,  # The type of action (e.g., 'create', 'update', 'delete')
+        content_type=ContentType.objects.get_for_model(instance),  # Get the content type for the model instance
+        object_id=str(instance.pk),  # ID of the affected object
+        changes=changes,  # The changes made (if any)
+        ip_address=getattr(user, 'audit_log_data', {}).get('ip_address'),  # Get the IP address from the middleware
+        user_agent=getattr(user, 'audit_log_data', {}).get('user_agent'),  # Get the user agent from the middleware
     )
