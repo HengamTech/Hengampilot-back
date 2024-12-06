@@ -4,6 +4,7 @@ from django.db.utils import IntegrityError
 
 class UserModelTest(TestCase):
 
+
     def test_create_user(self):
         """Test creating a user with the custom manager"""
         user = User.objects.create_user(
