@@ -1,9 +1,12 @@
 from rest_framework import serializers
 from .models import User, Notifications
-
+from django.contrib.auth.password_validation import validate_password
 
 # Serializer for the User model
 class UserSerializer(serializers.ModelSerializer):
+    # اضافه کردن اعتبارسنجی پسورد
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True, validators=[validate_password])
+
     class Meta:
         model = User
         # Define which fields to include in the serialized representation
@@ -23,6 +26,20 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
+    # Method to update an existing user
+    def update(self, instance, validated_data):
+        # بروزرسانی فیلدهای غیر پسورد
+        instance.email = validated_data.get("email", instance.email)
+        instance.username = validated_data.get("username", instance.username)
+        instance.is_active = validated_data.get("is_active", instance.is_active)
+        # می‌توانید سایر فیلدهای مربوطه را نیز اضافه کنید
+
+        # بررسی و بروزرسانی پسورد در صورت وجود
+        password = validated_data.get("password", None)
+        if password:
+            instance.set_password(password)  # هش کردن پسورد
+        instance.save()
+        return instance
 
 # Serializer for the Notifications model
 class NotificationSerializer(serializers.ModelSerializer):
