@@ -133,20 +133,9 @@ DATABASES = {
         "USER": "username",
         "PASSWORD": 1234,
         "HOST": "127.0.0.1",
-        "PORT": 5433,
+        "PORT": 5432,
     }
 }
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "hengam",
-#         "USER": "mohammad",
-#         "PASSWORD": 1234,
-#         "HOST": "127.0.0.1",
-#         "PORT": 5434,
-#     }
-# }
 
 
 SPECTACULAR_SETTINGS = {

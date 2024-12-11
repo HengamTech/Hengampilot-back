@@ -28,7 +28,7 @@ class Business(models.Model):
     description = models.TextField(null=False, blank=False)
     website_url = models.CharField(max_length=50, null=True, blank=True)
     
-    # Average rank for the business
+    # Average rank for the business ?
     average_rank = models.IntegerField()
     
     # Timestamps for when the business is created and last updated
