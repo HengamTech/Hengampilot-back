@@ -2,7 +2,6 @@ from rest_framework import viewsets
 from .models import Review, Vote, Reports, ReviewResponse
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
 from .serializers import (
     ReviewSerializer,
     VoteSerializer,
@@ -10,10 +9,8 @@ from .serializers import (
     ReviewResponseSerializer,
 )
 from rest_framework import status
-
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated , AllowAny
 from .tasks import add_review_view, add_report_view
-
 
 # ViewSet for handling reviews
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -24,6 +21,17 @@ class ReviewViewSet(viewsets.ModelViewSet):
     # Set permission class to ensure only authenticated users can access the viewset
     permission_classes = [IsAuthenticated]
 
+    def get_permissions(self): 
+        if self.action in ['list', 'retrieve', 'view_reviews']: 
+            return [AllowAny()] 
+        return [IsAuthenticated()]
+    
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path='view_reviews') 
+    def view_reviews(self, request): 
+        reviews = Review.objects.all() 
+        serializer = ReviewSerializer(reviews, many=True) 
+        return Response(serializer.data)
+    
     # Custom action for adding a review (this triggers a background task)
     @action(detail=False, methods=["post"])
     def add_review(self, request):
