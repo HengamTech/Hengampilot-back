@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 
 class ReviewModelTestCase(TestCase):
     def setUp(self):
-        """ایجاد کاربران و کسب و کار برای استفاده در تست‌ها"""
+        """Creating users and businesses for use in tests"""
         self.user = User.objects.create(username="testuser", password="testpass")
         self.business = Business.objects.create(
             business_name="Test Business",
@@ -18,7 +18,7 @@ class ReviewModelTestCase(TestCase):
         )
 
     def test_create_review(self):
-        """تست ایجاد یک رکورد Review به درستی"""
+        """Test creating a Review record correctly"""
         review = Review.objects.create(
             user=self.user,
             business_id=self.business,
@@ -31,7 +31,7 @@ class ReviewModelTestCase(TestCase):
         self.assertEqual(review.review_text, "Great business!")
 
     def test_review_without_user(self):
-        """تست ایجاد Review بدون کاربر که باید خطا دهد"""
+        """Test creating a Review without a user, which should raise an error"""
         with self.assertRaises(IntegrityError):
             Review.objects.create(
                 business_id=self.business,
@@ -40,7 +40,7 @@ class ReviewModelTestCase(TestCase):
             )
 
     def test_review_without_business(self):
-        """تست ایجاد Review بدون کسب و کار که باید خطا دهد"""
+        """Test creating a Review without a business, which should raise an error"""
         with self.assertRaises(IntegrityError):
             Review.objects.create(
                 user=self.user,
@@ -49,16 +49,16 @@ class ReviewModelTestCase(TestCase):
             )
 
     def test_default_rank_value(self):
-        """تست مقدار پیش‌فرض فیلد rank"""
+        """Test the default value of the rank field"""
         review = Review.objects.create(
             user=self.user,
             business_id=self.business,
             review_text="Average business.",
         )
-        self.assertEqual(review.rank, 3)  # پیش‌فرض باید 3 باشد
+        self.assertEqual(review.rank, 3)  # The default should be 3
 
     def test_review_str_method(self):
-        """تست متد __str__ برای Review"""
+        """Test the __str__ method for Review"""
         review = Review.objects.create(
             user=self.user,
             business_id=self.business,
@@ -70,7 +70,7 @@ class ReviewModelTestCase(TestCase):
 
 class VoteModelTestCase(TestCase):
     def setUp(self):
-        """ایجاد کاربران و رای‌دهی برای استفاده در تست‌ها"""
+        """Creating users and votes for use in tests"""
         self.user = User.objects.create(username="testuser", password="testpass")
         self.business = Business.objects.create(
             business_name="Test Business",
@@ -86,7 +86,7 @@ class VoteModelTestCase(TestCase):
         )
 
     def test_create_vote(self):
-        """تست ایجاد یک رکورد Vote به درستی"""
+        """Test creating a Vote record correctly"""
         vote = Vote.objects.create(
             user=self.user,
             review=self.review,
@@ -95,19 +95,19 @@ class VoteModelTestCase(TestCase):
         self.assertEqual(vote.review, self.review)
 
     def test_vote_without_user(self):
-        """تست ایجاد Vote بدون کاربر که باید خطا دهد"""
+        """Test creating a Vote without a user, which should raise an error"""
         with self.assertRaises(IntegrityError):
             Vote.objects.create(review=self.review)
 
     def test_vote_without_review(self):
-        """تست ایجاد Vote بدون review که باید خطا دهد"""
+        """Test creating a Vote without a review, which should raise an error"""
         with self.assertRaises(IntegrityError):
             Vote.objects.create(user=self.user)
 
 
 class ReviewResponseModelTestCase(TestCase):
     def setUp(self):
-        """ایجاد کاربران و پاسخ به بررسی برای استفاده در تست‌ها"""
+        """Creating users and review responses for use in tests"""
         self.user = User.objects.create(username="testuser", password="testpass")
         self.business = Business.objects.create(
             business_name="Test Business",
@@ -123,7 +123,7 @@ class ReviewResponseModelTestCase(TestCase):
         )
 
     def test_create_review_response(self):
-        """تست ایجاد یک رکورد ReviewResponse به درستی"""
+        """Test creating a ReviewResponse record correctly"""
         response = ReviewResponse.objects.create(
             review=self.review,
             description="Thank you for your feedback!",
@@ -132,7 +132,7 @@ class ReviewResponseModelTestCase(TestCase):
         self.assertEqual(response.description, "Thank you for your feedback!")
 
     def test_review_response_str_method(self):
-        """تست متد __str__ برای ReviewResponse"""
+        """Test the __str__ method for ReviewResponse"""
         response = ReviewResponse.objects.create(
             review=self.review,
             description="Thanks for the review!",
@@ -142,7 +142,7 @@ class ReviewResponseModelTestCase(TestCase):
 
 class ReportModelTestCase(TestCase):
     def setUp(self):
-        """ایجاد کاربران و گزارش برای استفاده در تست‌ها"""
+        """Creating users and reports for use in tests"""
         self.user = User.objects.create(username="testuser", password="testpass")
         self.business = Business.objects.create(
             business_name="Test Business",
@@ -158,7 +158,7 @@ class ReportModelTestCase(TestCase):
         )
 
     def test_create_report(self):
-        """تست ایجاد یک رکورد Report به درستی"""
+        """Test creating a Report record correctly"""
         report = Reports.objects.create(
             review_id=self.review,
             review_user_id=self.user,
@@ -171,7 +171,7 @@ class ReportModelTestCase(TestCase):
         self.assertEqual(report.reason, "Inappropriate content.")
 
     def test_report_without_review(self):
-        """تست ایجاد Report بدون review که باید خطا دهد"""
+        """Test creating a Report without a review, which should raise an error"""
         with self.assertRaises(IntegrityError):
             Reports.objects.create(
                 review_user_id=self.user,
@@ -180,7 +180,7 @@ class ReportModelTestCase(TestCase):
             )
 
     def test_report_without_user(self):
-        """تست ایجاد Report بدون user که باید خطا دهد"""
+        """Test creating a Report without a user, which should raise an error"""
         with self.assertRaises(IntegrityError):
             Reports.objects.create(
                 review_id=self.review,
@@ -189,7 +189,7 @@ class ReportModelTestCase(TestCase):
             )
 
     def test_report_str_method(self):
-        """تست متد __str__ برای Report"""
+        """Test the __str__ method for Report"""
         report = Reports.objects.create(
             review_id=self.review,
             review_user_id=self.user,

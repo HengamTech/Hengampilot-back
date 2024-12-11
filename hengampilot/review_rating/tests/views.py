@@ -1,148 +1,163 @@
-# from rest_framework.test import APITestCase
-# from rest_framework import status
-# from django.urls import reverse
-# from rest_framework.test import APIClient
-# from review_rating.models import Review, Vote, Reports, ReviewResponse
-# from user_management.models import User
-# from rest_framework_simplejwt.tokens import RefreshToken
-# from uuid import uuid4
-
-# class ReviewViewSetTestCase(APITestCase):
-#     def setUp(self):
-#         # Create a user for authentication
-#         self.user = User.objects.create_user(
-#             username="testuser",
-#             email="testuser@example.com",
-#             password="testpassword",
-#             is_active=True
-#         )
-#         self.client = APIClient()
-#         self.client.force_authenticate(user=self.user)  # authenticate as the test user
-#         self.url = reverse('review_rating:review-list')  # URL for reviews endpoint
-
-#     def test_create_review(self):
-#         # Test creating a new review
-#         data = {
-#             'user': str(self.user.id),
-#             'business_id': str(uuid4()),  # You can replace this with a valid business id
-#             'rank': 4,
-#             'review_text': 'Great service!',
-#         }
-#         response = self.client.post(self.url, data, format='json')
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-#     def test_add_review_task(self):
-#         # Test the custom action that triggers a review background task
-#         add_review_url = reverse('review_rating:review-add_review')  # Custom action URL
-#         data = {
-#             'user': str(self.user.id),
-#             'business_id': str(uuid4()),
-#             'rank': 4,
-#             'review_text': 'Excellent!',
-#         }
-#         response = self.client.post(add_review_url, data, format='json')
-#         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
-#         self.assertEqual(response.data['message'], 'Review addition task initiated successfully')
+from django.urls import reverse
+from rest_framework.test import APIClient, APITestCase
+from rest_framework import status
+from user_management.models import User
+from business_management.models import Business
+from review_rating.models import Review, Vote, Reports, ReviewResponse
 
 
-# class VoteViewSetTestCase(APITestCase):
-#     def setUp(self):
-#         # Create a user and review
-#         self.user = User.objects.create_user(
-#             username="testuser",
-#             email="testuser@example.com",
-#             password="testpassword",
-#             is_active=True
-#         )
-#         self.client = APIClient()
-#         self.client.force_authenticate(user=self.user)
-#         self.review = Review.objects.create(
-#             user=self.user,
-#             business_id=str(uuid4()),
-#             rank=5,
-#             review_text='Great product!'
-#         )
-#         self.url = reverse('review_rating:vote-list')
+class ReviewViewSetTestCase(APITestCase):
+    def setUp(self):
+        """Creating users and businesses for use in tests"""
+        self.user = User.objects.create(username="testuser", password="testpass")
+        self.business = Business.objects.create(
+            business_name="Test Business",
+            business_owner=self.user,
+            description="Test business description",
+            average_rank=3,
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
 
-#     def test_create_vote(self):
-#         # Test creating a new vote on a review
-#         data = {
-#             'user': str(self.user.id),
-#             'review': str(self.review.id),
-#         }
-#         response = self.client.post(self.url, data, format='json')
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    def test_create_review(self):
+        """Test creating a review through the viewset"""
+        url = reverse("review_rating:reviews-list")
+        data = {
+            "user": self.user.id,
+            "business_id": self.business.id,
+            "rank": 5,
+            "review_text": "Great business!",
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["review_text"], "Great business!")
 
 
-# class ReportsViewSetTestCase(APITestCase):
-#     def setUp(self):
-#         # Create a user and review
-#         self.user = User.objects.create_user(
-#             username="testuser",
-#             email="testuser@example.com",
-#             password="testpassword",
-#             is_active=True
-#         )
-#         self.client = APIClient()
-#         self.client.force_authenticate(user=self.user)
-#         self.review = Review.objects.create(
-#             user=self.user,
-#             business_id=str(uuid4()),
-#             rank=3,
-#             review_text="Bad experience."
-#         )
-#         self.url = reverse('review_rating:reports-list')
-
-#     def test_create_report(self):
-#         # Test creating a new report on a review
-#         data = {
-#             'review_id': str(self.review.id),
-#             'review_user_id': str(self.user.id),
-#             'reason_select': 'violence',
-#             'reason': 'Offensive content',
-#             'result_report': 'Unchecked',
-#         }
-#         response = self.client.post(self.url, data, format='json')
-#         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-#     def test_add_report_task(self):
-#         # Test the custom action that triggers a report background task
-#         add_report_url = reverse('review_rating:reports-add_report')  # Custom action URL
-#         data = {
-#             'review_id': str(self.review.id),
-#             'review_user_id': str(self.user.id),
-#             'reason_select': 'sexual',
-#             'reason': 'Inappropriate content',
-#         }
-#         response = self.client.post(add_report_url, data, format='json')
-#         self.assertEqual(response.status_code, status.HTTP_202_ACCEPTED)
-#         self.assertEqual(response.data['message'], 'Report creation task initiated successfully')
+    def test_add_review_action(self):
+        """Test the add_review custom action"""
+        url = reverse("review_rating:reviews-list")  # Assuming the action is mapped to this URL
+        data = {
+            "user": self.user.id,
+            "business_id": self.business.id,
+            "rank": 5,
+            "review_text": "Amazing service!",
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
 
 
-# class ReviewResponseViewSetTestCase(APITestCase):
-#     def setUp(self):
-#         # Create a user and review
-#         self.user = User.objects.create_user(
-#             username="testuser",
-#             email="testuser@example.com",
-#             password="testpassword",
-#             is_active=True
-#         )
-#         self.client = APIClient()
-#         self.client.force_authenticate(user=self.user)
-#         self.review = Review.objects.create(
-#             user=self.user,
-#             business_id=str(uuid4()),
-#             rank=5,
-#             review_text='Great product!'
-#         )
-#         self.url = reverse('review_rating:reviewresponse-list')
+class VoteViewSetTestCase(APITestCase):
+    def setUp(self):
+        """Creating users and votes for use in tests"""
+        self.user = User.objects.create(username="testuser", password="testpass")
+        self.business = Business.objects.create(
+            business_name="Test Business",
+            business_owner=self.user,
+            description="Test business description",
+            average_rank=3,
+        )
+        self.review = Review.objects.create(
+            user=self.user,
+            business_id=self.business,
+            rank=4,
+            review_text="Nice business!",
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
 
-#     def test_create_review_response(self):
-#         # Test creating a new review response
-#         data = {
-#             'review': str(self.review.id),
-#             'description': 'Thank you for your feedback!',
-#         }
-#         response = self.client.post(self.url, data, format='json')
-#         self.assertE
+    def test_create_vote(self):
+        """Test creating a vote through the viewset"""
+        url = reverse("review_rating:votes-list")
+        data = {
+            "user": self.user.id,
+            "review": self.review.id,
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["user"], self.user.id)
+
+    def test_vote_without_user(self):
+        """Test creating a vote without a user, which should raise an error"""
+        url = reverse("review_rating:votes-list")
+        data = {"review": self.review.id}
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+class ReportsViewSetTestCase(APITestCase):
+    def setUp(self):
+        """Creating users and reports for use in tests"""
+        self.user = User.objects.create(username="testuser", password="testpass")
+        self.business = Business.objects.create(
+            business_name="Test Business",
+            business_owner=self.user,
+            description="Test business description",
+            average_rank=3,
+        )
+        self.review = Review.objects.create(
+            user=self.user,
+            business_id=self.business,
+            rank=4,
+            review_text="Nice business!",
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_report(self):
+        """Test creating a report through the viewset"""
+        url = reverse("review_rating:reports-list")
+        data = {
+            "review_id": self.review.id,
+            "review_user_id": self.user.id,
+            "reason_select": "terrorism",  # Assuming the values are passed as strings
+            "reason": "Inappropriate content.",
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["reason"], "Inappropriate content.")
+
+    def test_add_report_action(self):
+        """Test the add_report custom action"""
+        url = reverse("review_rating:reports-list")  # Assuming the action is mapped to this URL
+        data = {
+            "review_id": self.review.id,
+            "review_user_id": self.user.id,
+            "reason_select": "terrorism",
+            "reason": "Inappropriate content.",
+        }
+        response = self.client.post(url, data, format="json")
+        #print(response.data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+
+
+class ReviewResponseViewSetTestCase(APITestCase):
+    def setUp(self):
+        """Creating users and review responses for use in tests"""
+        self.user = User.objects.create(username="testuser", password="testpass")
+        self.business = Business.objects.create(
+            business_name="Test Business",
+            business_owner=self.user,
+            description="Test business description",
+            average_rank=3,
+        )
+        self.review = Review.objects.create(
+            user=self.user,
+            business_id=self.business,
+            rank=4,
+            review_text="Nice business!",
+        )
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_review_response(self):
+        """Test creating a review response through the viewset"""
+        url = reverse("review_rating:review_responses-list")
+        data = {
+            "review": self.review.id,
+            "description": "Thank you for your feedback!",
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["description"], "Thank you for your feedback!")

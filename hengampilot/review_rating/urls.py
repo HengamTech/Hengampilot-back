@@ -9,13 +9,17 @@ app_name = "review_rating"
 router = DefaultRouter()
 
 # Register the viewsets with the router, making them available for automatic URL routing
-router.register(r"reviews", ReviewViewSet)  # URL pattern for managing reviews
-router.register(r"votes", VoteViewSet)  # URL pattern for managing votes on reviews
 router.register(
-    r"reports", ReportsViewSet
+    r"reviews", ReviewViewSet, basename="reviews"
+)  # URL pattern for managing reviews
+router.register(
+    r"votes", VoteViewSet, basename="votes"
+)  # URL pattern for managing votes on reviews
+router.register(
+    r"reports", ReportsViewSet, basename="reports"
 )  # URL pattern for managing reports on reviews
 router.register(
-    r"review_responses", ReviewResponseViewSet
+    r"review_responses", ReviewResponseViewSet, basename="review_responses"
 )  # URL pattern for managing review responses
 
 # Define the URL patterns for this app, including the automatically generated URL patterns from the router
