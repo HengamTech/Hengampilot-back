@@ -98,7 +98,7 @@ class UserTestCase(APITestCase):
         )  # Assert updated name matches
 
 
-class SubscriptionTestCase(unittest.TestCase):
+class SubscriptionTestCase(APITestCase):
     # Setup method to create a user, business, and subscription before tests
     def setUp(self):
         self.client = APIClient()  # Create an instance of the APIClient
