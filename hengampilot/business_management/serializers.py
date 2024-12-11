@@ -45,6 +45,7 @@ class BusinessCreateSerializer(serializers.ModelSerializer):
             "business_name",  # Name of the business
             "description",  # Description of the business
             "website_url",  # URL of the business website (optional)
+            "business_category"
         )
 
 
