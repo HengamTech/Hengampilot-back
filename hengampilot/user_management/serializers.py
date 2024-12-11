@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "email", "username", "password", "is_active", "created_at")
+        fields = ("id", "email", "username", "first_name", "last_name", "password", "is_active", "created_at")
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
@@ -18,12 +18,16 @@ class UserSerializer(serializers.ModelSerializer):
             email=validated_data["email"],
             password=validated_data["password"],
             is_active=True,
+            first_name=validated_data.get("first_name", ""),
+            last_name=validated_data.get("last_name", ""),
         )
         return user
 
     def update(self, instance, validated_data):
         instance.email = validated_data.get("email", instance.email)
         instance.username = validated_data.get("username", instance.username)
+        instance.first_name = validated_data.get("first_name", instance.first_name)
+        instance.last_name = validated_data.get("last_name", instance.last_name)
         instance.is_active = validated_data.get("is_active", instance.is_active)
         
         # Check and update password if provided
