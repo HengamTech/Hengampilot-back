@@ -18,6 +18,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Username for the user (must be unique)
     username = models.CharField(max_length=50, unique=True, help_text="Ehsan")
 
+    # First name and last name
+    first_name = models.CharField(max_length=50, blank=True, null=True, help_text="First Name")
+    last_name = models.CharField(max_length=50, blank=True, null=True, help_text="Last Name")
+
+    # Profile picture
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True, help_text="Profile Picture")
+
+
+
     # Whether the user is hidden or not
     hidden = models.BooleanField(default=False)
 
