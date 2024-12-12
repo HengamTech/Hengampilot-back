@@ -4,10 +4,20 @@ If you haven't already, install the pre-commit hooks:
 You can also run pre-commit on all files to format them immediately:
 >>> pre-commit run --all-files
 
+
+
+
 coverage
->>>coverage run manage.py test
->>>coverage run manage.py test app1
->>>coverage run manage.py test app1.tests
+coverage run  manage.py test review_rating.tests.views 
+coverage run  manage.py test review_rating.tests.models 
+coverage run  manage.py test user_management.tests.models 
+coverage run  manage.py test user_management.tests.views 
+coverage run  manage.py test business_management.tests.views 
+coverage run  manage.py test business_management.tests.models 
+coverage run  manage.py test platform_management.tests.models 
+coverage run  manage.py test platform_management.tests.views 
+
+coverage run manage.py test app1.tests
 coverage report
 coverage html
 
