@@ -1,24 +1,22 @@
 from rest_framework import viewsets, status, filters
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated , AllowAny
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Business, Subscription
+from .models import Business, Subscription , Category
 from .serializers import (
     BusinessSerializer,
     BusinessCreateSerializer,
     BusinessUpdateSerializer,
     SubscriptionSerializer,
+    CategorySerializer # doesn't exists
 )
 from .tasks import manage_subscription
-
 
 # ViewSet for managing Business operations (CRUD)
 class BusinessViewSet(viewsets.ModelViewSet):
     queryset = Business.objects.all()  # Get all Business records
-    serializer_class = (
-        BusinessSerializer  # Default serializer class for the Business model
-    )
+    serializer_class = BusinessSerializer  # Default serializer class for the Business model
     permission_classes = [IsAuthenticated]  # Only authenticated users can access
     filter_backends = [
         DjangoFilterBackend,  # Backend for filtering
@@ -26,11 +24,13 @@ class BusinessViewSet(viewsets.ModelViewSet):
         filters.OrderingFilter,  # Backend for ordering results
     ]
     search_fields = ["business_name", "description"]  # Fields to be searchable
-    ordering_fields = [
-        "created_at",
-        "average_rank",
-    ]  # Fields by which the results can be ordered
+    ordering_fields = ["created_at", "average_rank"]  # Fields by which the results can be ordered
 
+    def get_permissions(self): 
+        if self.action in ['list', 'retrieve', 'categories']: 
+            return [AllowAny()] # Allow any user to access these actions 
+        return [IsAuthenticated()]
+    
     # Dynamically return the appropriate serializer class based on the action
     def get_serializer_class(self):
         # Use the BusinessCreateSerializer for the create action
@@ -46,13 +46,16 @@ class BusinessViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(business_owner=self.request.user, average_rank=0)
 
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path='categories') 
+    def list_categories(self, request): 
+        categories = Category.objects.all() 
+        serializer = CategorySerializer(categories, many=True) 
+        return Response(serializer.data)
 
 # ViewSet for managing Subscription operations (CRUD)
 class SubscriptionVeiw(viewsets.ModelViewSet):
     queryset = Subscription.objects.all()  # Get all Subscription records
-    serializer_class = (
-        SubscriptionSerializer  # Default serializer class for the Subscription model
-    )
+    serializer_class = SubscriptionSerializer  # Default serializer class for the Subscription model
     permission_classes = [IsAuthenticated]  # Only authenticated users can access
 
     # Custom action to manage a subscription (activate, deactivate, change type)

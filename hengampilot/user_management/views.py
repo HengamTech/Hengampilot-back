@@ -7,7 +7,6 @@ from .models import User, Notifications
 from .serializers import UserSerializer, NotificationSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -24,25 +23,33 @@ class UserViewSet(viewsets.ModelViewSet):
         ],
         responses={200: UserSerializer, 404: 'User not found', 400: 'Bad Request'}
     )
-    @action(detail=False, methods=["get"], url_path='fetch-by-username') 
-    def fetch_by_username(self, request): 
-        username = request.query_params.get('username', None) 
-        if username is not None: 
-            try: 
-                user = User.objects.get(username=username) 
-                serializer = UserSerializer(user) 
-                return Response(serializer.data, status=status.HTTP_200_OK) 
-            except User.DoesNotExist: 
-                return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND) 
-        else: 
+    @action(detail=False, methods=["get"], url_path='fetch-by-username')
+    def fetch_by_username(self, request):
+        username = request.query_params.get('username', None)
+        if username is not None:
+            try:
+                user = User.objects.get(username=username)
+                serializer = UserSerializer(user)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except User.DoesNotExist:
+                return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        else:
             return Response({"detail": "Username query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
-
 
     @action(detail=False, methods=["get"])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
+    @action(detail=True, methods=["post"], url_path="update-password")
+    def update_password(self, request, pk=None):
+        user = self.get_object()
+        new_password = request.data.get("password")
+        if not new_password:
+            return Response({"detail": "Password is required"}, status=status.HTTP_400_BAD_REQUEST)
+        user.set_password(new_password)
+        user.save()
+        return Response({"detail": "Password updated successfully"}, status=status.HTTP_200_OK)
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()

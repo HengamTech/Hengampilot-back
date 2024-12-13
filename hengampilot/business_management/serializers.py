@@ -1,7 +1,11 @@
 from rest_framework import serializers
-from .models import Business, Subscription
+from .models import Business, Subscription, Category
 from review_rating.models import Review
 
+class CategorySerializer(serializers.ModelSerializer): 
+    class Meta: 
+        model = Category 
+        fields = "__all__" # Include all fields of the Category model
 
 # Serializer for Business model, including additional fields for average rating and total reviews
 class BusinessSerializer(serializers.ModelSerializer):
