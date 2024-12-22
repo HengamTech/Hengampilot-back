@@ -108,6 +108,49 @@ class VoteViewSet(viewsets.ModelViewSet):
     # Set permission class to ensure only authenticated users can access the viewset
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "username", str, description="The username of the user.", required=False
+            ),
+            OpenApiParameter(
+                "id", str, description="The user ID (UUID).", required=False
+            ),
+        ],
+        responses={
+            200: ReviewSerializer(many=True),
+            400: "Bad Request",
+            404: "User not found",
+        },
+    )
+    @action(detail=False, methods=["get"], url_path="reviews-liked-by-user")
+    def reviews_liked_by_user(self, request):
+        username = request.query_params.get("username")
+        user_id = request.query_params.get("id")
+
+        if not username and not user_id:
+            return Response(
+                {"detail": "Either 'username' or 'id' query parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            if username:
+                user = User.objects.get(username=username)
+            elif user_id:
+                user = User.objects.get(id=user_id)
+
+            votes = Vote.objects.filter(user=user)
+
+            reviews_liked = [vote.review for vote in votes]
+            serializer = ReviewSerializer(reviews_liked, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+
 
 # ViewSet for handling reports
 class ReportsViewSet(viewsets.ModelViewSet):
