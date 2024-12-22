@@ -129,11 +129,11 @@ AUTH_USER_MODEL = "user_management.User"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "pdb",
-        "USER": "ehsan",
+        "NAME": "postgres",
+        "USER": "username",
         "PASSWORD": 1234,
-        "HOST": "db",
-        "PORT": 5432,
+        "HOST": "127.0.0.1",
+        "PORT": 5433,
     }
 }
 
@@ -198,4 +198,3 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_ALWAYS_EAGER = True
 CELERY_TASK_EAGER_PROPAGATES = True  # Propagate exceptions to the caller
-

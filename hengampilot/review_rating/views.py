@@ -1,7 +1,10 @@
 from rest_framework import viewsets
+
 from .models import Review, Vote, Reports, ReviewResponse
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema, OpenApiParameter
+
 from .serializers import (
     ReviewSerializer,
     VoteSerializer,
@@ -9,8 +12,10 @@ from .serializers import (
     ReviewResponseSerializer,
 )
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated , AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .tasks import add_review_view, add_report_view
+from user_management.models import User
+
 
 # ViewSet for handling reviews
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -21,17 +26,22 @@ class ReviewViewSet(viewsets.ModelViewSet):
     # Set permission class to ensure only authenticated users can access the viewset
     permission_classes = [IsAuthenticated]
 
-    def get_permissions(self): 
-        if self.action in ['list', 'retrieve', 'view_reviews']: 
-            return [AllowAny()] 
+    def get_permissions(self):
+        if self.action in ["list", "retrieve", "view_reviews"]:
+            return [AllowAny()]
         return [IsAuthenticated()]
-    
-    @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path='view_reviews') 
-    def view_reviews(self, request): 
-        reviews = Review.objects.all() 
-        serializer = ReviewSerializer(reviews, many=True) 
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[AllowAny],
+        url_path="view_reviews",
+    )
+    def view_reviews(self, request):
+        reviews = Review.objects.all()
+        serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
-    
+
     # Custom action for adding a review (this triggers a background task)
     @action(detail=False, methods=["post"])
     def add_review(self, request):
@@ -44,6 +54,49 @@ class ReviewViewSet(viewsets.ModelViewSet):
             {"message": "Review addition task initiated successfully"},
             status=status.HTTP_202_ACCEPTED,
         )
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "username", str, description="The username of the user.", required=False
+            ),
+            OpenApiParameter(
+                "id", str, description="The user ID (UUID).", required=False
+            ),
+        ],
+        responses={
+            200: ReviewSerializer(many=True),
+            400: "Bad Request",
+            404: "User not found",
+        },
+    )
+    @action(detail=False, methods=["get"], url_path="reviews-by-user")
+    def reviews_by_user(self, request):
+        username = request.query_params.get("username")
+        user_id = request.query_params.get("id")
+
+        if not username and not user_id:
+            return Response(
+                {"detail": "Either 'username' or 'id' query parameter is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            # username or id
+            if username:
+                user = User.objects.get(username=username)
+            elif user_id:
+                user = User.objects.get(id=user_id)
+
+            # review from specific user
+            reviews = Review.objects.filter(user=user)
+            serializer = ReviewSerializer(reviews, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 # ViewSet for handling votes
