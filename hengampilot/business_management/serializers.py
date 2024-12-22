@@ -70,3 +70,4 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         fields = "__all__"  # Include all fields of the Subscription model
+

@@ -68,7 +68,6 @@ class BusinessViewSet(viewsets.ModelViewSet):
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data)
 
-
     @extend_schema(
         parameters=[
             OpenApiParameter(
@@ -147,3 +146,9 @@ class SubscriptionVeiw(viewsets.ModelViewSet):
             {"message": f"Subscription {action} task has been initiated."},
             status=status.HTTP_202_ACCEPTED,
         )
+
+
+class CategoryView(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
