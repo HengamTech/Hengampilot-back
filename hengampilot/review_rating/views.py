@@ -24,7 +24,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     # Specify the serializer to be used
     serializer_class = ReviewSerializer
     # Set permission class to ensure only authenticated users can access the viewset
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve", "view_reviews"]:
