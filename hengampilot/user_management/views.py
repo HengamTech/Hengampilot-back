@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from .models import User, Notifications
 from .serializers import UserSerializer, NotificationSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter
+from review_rating.models import Review
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -50,7 +51,38 @@ class UserViewSet(viewsets.ModelViewSet):
         user.set_password(new_password)
         user.save()
         return Response({"detail": "Password updated successfully"}, status=status.HTTP_200_OK)
-
+    
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="total-users") 
+    def total_users(self, request): 
+        count = User.objects.count() 
+        return Response({"total_users": count}, status=status.HTTP_200_OK) 
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="active-users") 
+    def active_users(self, request): 
+        count = User.objects.filter(is_active=True).count() 
+        return Response({"active_users": count}, status=status.HTTP_200_OK) 
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="inactive-users") 
+    def inactive_users(self, request): 
+        count = User.objects.filter(is_active=False).count() 
+        return Response({"inactive_users": count}, status=status.HTTP_200_OK)
+    
+    @extend_schema( 
+        parameters=[ 
+            OpenApiParameter('user_id', str, description='The ID of the user whose reviews you want to count.', required=True)
+              ], 
+              responses={200: "Review count"} ) 
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="user-review-count") 
+    def user_review_count(self, request): 
+        user_id = request.query_params.get('user_id', None) 
+        if user_id: 
+            try: 
+                user = User.objects.get(id=user_id) 
+                count = Review.objects.filter(user=user).count() 
+                return Response({"user_review_count": count}, status=status.HTTP_200_OK) 
+            except User.DoesNotExist: 
+                return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND) 
+        else: 
+            return Response({"detail": "User ID query parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+            
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()
     serializer_class = NotificationSerializer

@@ -1,10 +1,8 @@
 from rest_framework import viewsets
-
 from .models import Review, Vote, Reports, ReviewResponse
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-
 from .serializers import (
     ReviewSerializer,
     VoteSerializer,
@@ -15,7 +13,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .tasks import add_review_view, add_report_view
 from user_management.models import User
-
+from django.utils import timezone 
+from datetime import timedelta
+from django.db.models import Avg
 
 # ViewSet for handling reviews
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -40,6 +40,27 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def view_reviews(self, request):
         reviews = Review.objects.all()
         serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path='count-all-reviews') 
+    def count_all_reviews(self, request): 
+        count = Review.objects.count() 
+        return Response({'count': count}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path='count-unapproved-reviews') 
+    def count_unapproved_reviews(self, request): 
+        count = Review.objects.filter(approved=False).count() 
+        return Response({'count': count}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path='waiting-approval-reviews') 
+    def waiting_approval_reviews(self, request): 
+        period = request.query_params.get('period', 'day') 
+        if period == 'day': since = timezone.now() - timedelta(days=1) 
+        elif period == 'month': since = timezone.now() - timedelta(days=30) 
+        elif period == 'year': since = timezone.now() - timedelta(days=365) 
+        else: return Response({'error': 'Invalid period specified. Use day, month, or year.'}, status=status.HTTP_400_BAD_REQUEST) 
+        reviews = Review.objects.filter(approved=False, created_at__gte=since) 
+        serializer = ReviewSerializer(reviews, many=True) 
         return Response(serializer.data)
 
     # Custom action for adding a review (this triggers a background task)
@@ -98,7 +119,11 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 {"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
-
+    @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path='average-rating') 
+    def average_rating(self, request): 
+        average = Review.objects.aggregate(Avg('rank'))['rank__avg'] 
+        return Response({'average_rating': average}, status=status.HTTP_200_OK)
+    
 # ViewSet for handling votes
 class VoteViewSet(viewsets.ModelViewSet):
     # Set the queryset for the viewset
