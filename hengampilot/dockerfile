@@ -33,6 +33,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy project files
 COPY . .
+EXPOSE 8000
 COPY entrypoint.sh .
 RUN chmod +x entrypoint.sh
 

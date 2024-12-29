@@ -9,10 +9,9 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=1234
-      - POSTGRES_HOST_AUTH_METHOD=trust  # Add this line
+      - POSTGRES_HOST_AUTH_METHOD=trust
     ports:
-      - "5433:5433"
-    command: -p 5433
+      - "5432:5432"
     restart: always
 
   web:
@@ -27,7 +26,7 @@ services:
     environment:
       - DEBUG=True
       - DB_HOST=postgres
-      - DB_PORT=5433
+      - DB_PORT=5432  # Changed to match default PostgreSQL port
       - DB_NAME=postgres
       - DB_USER=username
       - DB_PASSWORD=1234
@@ -35,4 +34,3 @@ services:
 
 volumes:
   postgres_data:
-    driver: local  # Explicitly specify local driver
