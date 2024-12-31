@@ -5,11 +5,16 @@ from .models import AuditLog
 # Create middleware for automatically logging actions
 class AuditLogMiddleware(MiddlewareMixin):
     def process_request(self, request):
+        print("ahha")
         # Add IP address and user agent data to the request object for use in logging
         request.audit_log_data = {
             'ip_address': request.META.get('REMOTE_ADDR'),  # Get IP address from request metadata
             'user_agent': request.META.get('HTTP_USER_AGENT'),  # Get user agent from request headers
         }
+
+        # Add the current authenticated user to the request
+        if request.user.is_authenticated:
+            setattr(request, '_current_user', request.user)
 
 # Helper function to log user actions into the AuditLog model
 def log_action(user, action_type, instance, changes=None):
