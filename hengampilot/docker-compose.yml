@@ -1,17 +1,18 @@
 version: '3.8'
 
 services:
-  db:
+  postgres:
     image: postgres:13
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_DB: pdb
-      POSTGRES_USER: ehsan
-      POSTGRES_PASSWORD: 1234
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_HOST_AUTH_METHOD=trust
     ports:
-      - "5434:5432"  # Map external port 5434 to internal port 5432
-    command: -p 5432  # PostgreSQL will listen on its default port internally
+      - "5432:5432"
+    restart: always
 
   web:
     build: .
@@ -21,11 +22,15 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      - postgres
     environment:
-      DEBUG: 'True'
-      DATABASE_URL: postgres://ehsan:1234@db:5432/pdb  # Use internal port 5432
+      - DEBUG=True
+      - DB_HOST=postgres
+      - DB_PORT=5432  # Changed to match default PostgreSQL port
+      - DB_NAME=postgres
+      - DB_USER=username
+      - DB_PASSWORD=1234
+    restart: always
 
 volumes:
   postgres_data:
-    driver: local  # Explicitly specify local driver
