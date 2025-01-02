@@ -1,5 +1,7 @@
 from django.contrib.auth.models import BaseUserManager
 
+
+# Custom manager for managing User model creation
 class UserMnagers(BaseUserManager):
 
     # Method to create a regular user
@@ -17,12 +19,32 @@ class UserMnagers(BaseUserManager):
             username=username,
             email=self.normalize_email(email),  # Normalize the email to lowercase
         )
+
         user.set_password(password)
+
         user.is_active = is_active
+
         user.save(using=self._db)
+
         return user
 
-    def create_superuser(self, username, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_staff', True)
-        return self.create_user(username, email, password, **extra_fields)
+    # Method to create a superuser
+    def create_superuser(self, email, username, password):
+        """
+        Creates and saves a superuser with the given email, username,
+        and password. Sets is_admin and is_superuser to True.
+        """
+        # Use the create_user method to create a regular user first
+        user = self.create_user(
+            email, username=username, password=password, is_active=True
+        )
+
+        # Set superuser flags to True
+        user.is_admin = True
+        user.is_superuser = True
+
+        # Save the superuser to the database
+        user.save(using=self._db)
+
+        # Return the created superuser instance
+        return user
