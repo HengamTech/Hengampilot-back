@@ -6,8 +6,9 @@ from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
 )
+from django.core.files.images import get_image_dimensions
+from django.core.exceptions import ValidationError
 
-# Import custom manager for User model
 from .managers import UserMnagers
 
 
@@ -32,11 +33,35 @@ from .managers import UserMnagers
 
 
 # Custom User model that extends AbstractBaseUser and PermissionsMixin
+
+
+def validate_image_dimensions(image):
+    max_width = 1920  # Maximum width
+    max_height = 1080  # Maximum height
+
+    width, height = get_image_dimensions(image)
+
+    if width > max_width or height > max_height:
+        raise ValidationError(
+            f"Image dimensions must not exceed {max_width}x{max_height} pixels."
+        )
+
+
+def validate_image_size(image):
+    max_size = 5 * 1024 * 1024  # Maximum size = 5MB
+    if image.size > max_size:
+        raise ValidationError("Image size must be 5MB or fewer.")
+
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=30, unique=True)
     username = models.CharField(max_length=50, unique=True, help_text="Ehsan")
-    user_image = models.ImageField(upload_to='user_images/',null=True,blank=True)
+    user_image = models.ImageField(
+        upload_to="user_images/",
+        validators=[validate_image_size, validate_image_dimensions],
+        null=True,
+        blank=True,
+    )
     first_name = models.CharField(
         max_length=50, blank=True, null=True, help_text="First Name"
     )

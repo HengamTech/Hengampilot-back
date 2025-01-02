@@ -3,6 +3,26 @@ import uuid
 from user_management.models import User
 from enum import Enum
 from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
+from django.core.exceptions import ValidationError
+
+
+def validate_image_dimensions(image):
+    max_width = 1920  # Maximum width
+    max_height = 1080  # Maximum height
+
+    width, height = get_image_dimensions(image)
+
+    if width > max_width or height > max_height:
+        raise ValidationError(
+            f"Image dimensions must not exceed {max_width}x{max_height} pixels."
+        )
+
+
+def validate_image_size(image):
+    max_size = 5 * 1024 * 1024  # Maximum size = 5MB
+    if image.size > max_size:
+        raise ValidationError("Image size must be 5MB or fewer.")
 
 
 # Model representing a business entity
@@ -21,7 +41,10 @@ class Business(models.Model):
         blank=False,
     )
     business_image = models.ImageField(
-        upload_to="business_images/", null=True, blank=True
+        upload_to="business_images/",
+        validators=[validate_image_size, validate_image_dimensions],
+        null=True,
+        blank=True,
     )
     business_name = models.CharField(max_length=100, null=False, blank=False)
     description = models.TextField(null=False, blank=False)
@@ -73,7 +96,10 @@ class Category(models.Model):
 
     category_name = models.CharField(max_length=256)
     category_image = models.ImageField(
-        upload_to="category_image/", null=True, blank=True
+        upload_to="category_image/",
+        validators=[validate_image_size, validate_image_dimensions],
+        null=True,
+        blank=True,
     )
 
     def clean(self):
