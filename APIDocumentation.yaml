@@ -1,0 +1,3075 @@
+openapi: 3.0.3
+info:
+  title: API Documentation
+  version: 1.2.1
+  description: Hengam pilot
+paths:
+  /analytics/audit-logs/:
+    get:
+      operationId: analytics_audit_logs_list
+      parameters:
+      - in: query
+        name: action_type
+        schema:
+          type: string
+      - in: query
+        name: content_type
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: user
+        schema:
+          type: string
+          format: uuid
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /analytics/audit-logs/{id}/:
+    get:
+      operationId: analytics_audit_logs_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this audit log.
+        required: true
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+  /api/schema/:
+    get:
+      operationId: api_schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/token/:
+    post:
+      operationId: api_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/token/refresh/:
+    post:
+      operationId: api_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /business_management/businesses/:
+    get:
+      operationId: business_management_businesses_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Business'
+          description: ''
+    post:
+      operationId: business_management_businesses_create
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BusinessCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BusinessCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessCreate'
+          description: ''
+  /business_management/businesses/{id}/:
+    get:
+      operationId: business_management_businesses_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this business.
+        required: true
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Business'
+          description: ''
+    put:
+      operationId: business_management_businesses_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this business.
+        required: true
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BusinessUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BusinessUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessUpdate'
+          description: ''
+    patch:
+      operationId: business_management_businesses_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this business.
+        required: true
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBusinessUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBusinessUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBusinessUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessUpdate'
+          description: ''
+    delete:
+      operationId: business_management_businesses_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this business.
+        required: true
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /business_management/businesses/categories/:
+    get:
+      operationId: business_management_businesses_categories_retrieve
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Business'
+          description: ''
+  /business_management/businesses/category-businesses/:
+    get:
+      operationId: business_management_businesses_category_businesses_retrieve
+      parameters:
+      - in: query
+        name: category_name
+        schema:
+          type: string
+        description: Name of the category to retrieve business for.
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+  /business_management/businesses/reviews/:
+    get:
+      operationId: business_management_businesses_reviews_list
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: ID of the business to retrieve reviews for.
+      - in: query
+        name: name
+        schema:
+          type: string
+        description: Name of the business to retrieve reviews for.
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+  /business_management/category/:
+    get:
+      operationId: business_management_category_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+          description: ''
+    post:
+      operationId: business_management_category_create
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Category'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /business_management/category/{id}/:
+    get:
+      operationId: business_management_category_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this category.
+        required: true
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    put:
+      operationId: business_management_category_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this category.
+        required: true
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Category'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    patch:
+      operationId: business_management_category_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this category.
+        required: true
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    delete:
+      operationId: business_management_category_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this category.
+        required: true
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /business_management/subscription/:
+    get:
+      operationId: business_management_subscription_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+          description: ''
+    post:
+      operationId: business_management_subscription_create
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          description: ''
+  /business_management/subscription/{id}/:
+    get:
+      operationId: business_management_subscription_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this subscription.
+        required: true
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          description: ''
+    put:
+      operationId: business_management_subscription_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this subscription.
+        required: true
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          description: ''
+    patch:
+      operationId: business_management_subscription_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this subscription.
+        required: true
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSubscription'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSubscription'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSubscription'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          description: ''
+    delete:
+      operationId: business_management_subscription_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this subscription.
+        required: true
+      tags:
+      - business_management
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /business_management/subscription/{id}/manage/:
+    post:
+      operationId: business_management_subscription_manage_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this subscription.
+        required: true
+      tags:
+      - business_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+          description: ''
+  /platform/feature-requests/:
+    get:
+      operationId: platform_feature_requests_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - platform
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeatureRequest'
+          description: ''
+    post:
+      operationId: platform_feature_requests_create
+      tags:
+      - platform
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeatureRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureRequest'
+          description: ''
+  /platform/feature-requests/{id}/:
+    get:
+      operationId: platform_feature_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this feature request.
+        required: true
+      tags:
+      - platform
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureRequest'
+          description: ''
+    put:
+      operationId: platform_feature_requests_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this feature request.
+        required: true
+      tags:
+      - platform
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeatureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FeatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FeatureRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureRequest'
+          description: ''
+    patch:
+      operationId: platform_feature_requests_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this feature request.
+        required: true
+      tags:
+      - platform
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFeatureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFeatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFeatureRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeatureRequest'
+          description: ''
+    delete:
+      operationId: platform_feature_requests_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this feature request.
+        required: true
+      tags:
+      - platform
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /review_rating/reports/:
+    get:
+      operationId: review_rating_reports_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reports'
+          description: ''
+    post:
+      operationId: review_rating_reports_create
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reports'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Reports'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Reports'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reports'
+          description: ''
+  /review_rating/reports/{id}/:
+    get:
+      operationId: review_rating_reports_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this reports.
+        required: true
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reports'
+          description: ''
+    put:
+      operationId: review_rating_reports_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this reports.
+        required: true
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reports'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Reports'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Reports'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reports'
+          description: ''
+    patch:
+      operationId: review_rating_reports_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this reports.
+        required: true
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReports'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedReports'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedReports'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reports'
+          description: ''
+    delete:
+      operationId: review_rating_reports_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this reports.
+        required: true
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /review_rating/reports/add_report/:
+    post:
+      operationId: review_rating_reports_add_report_create
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reports'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Reports'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Reports'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reports'
+          description: ''
+  /review_rating/review_responses/:
+    get:
+      operationId: review_rating_review_responses_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReviewResponse'
+          description: ''
+    post:
+      operationId: review_rating_review_responses_create
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewResponse'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+          description: ''
+  /review_rating/review_responses/{id}/:
+    get:
+      operationId: review_rating_review_responses_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this review response.
+        required: true
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+          description: ''
+    put:
+      operationId: review_rating_review_responses_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this review response.
+        required: true
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReviewResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReviewResponse'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+          description: ''
+    patch:
+      operationId: review_rating_review_responses_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this review response.
+        required: true
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewResponse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewResponse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedReviewResponse'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewResponse'
+          description: ''
+    delete:
+      operationId: review_rating_review_responses_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this review response.
+        required: true
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /review_rating/reviews/:
+    get:
+      operationId: review_rating_reviews_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+          description: ''
+    post:
+      operationId: review_rating_reviews_create
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /review_rating/reviews/{id}/:
+    get:
+      operationId: review_rating_reviews_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this review.
+        required: true
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    put:
+      operationId: review_rating_reviews_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this review.
+        required: true
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    patch:
+      operationId: review_rating_reviews_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this review.
+        required: true
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedReview'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+    delete:
+      operationId: review_rating_reviews_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this review.
+        required: true
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /review_rating/reviews/add_review/:
+    post:
+      operationId: review_rating_reviews_add_review_create
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Review'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Review'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /review_rating/reviews/average-rating/:
+    get:
+      operationId: review_rating_reviews_average_rating_retrieve
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /review_rating/reviews/count-all-reviews/:
+    get:
+      operationId: review_rating_reviews_count_all_reviews_retrieve
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /review_rating/reviews/count-unapproved-reviews/:
+    get:
+      operationId: review_rating_reviews_count_unapproved_reviews_retrieve
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /review_rating/reviews/reviews-by-user/:
+    get:
+      operationId: review_rating_reviews_reviews_by_user_list
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: The user ID (UUID).
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: username
+        schema:
+          type: string
+        description: The username of the user.
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+  /review_rating/reviews/view_reviews/:
+    get:
+      operationId: review_rating_reviews_view_reviews_retrieve
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /review_rating/reviews/waiting-approval-reviews/:
+    get:
+      operationId: review_rating_reviews_waiting_approval_reviews_retrieve
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+          description: ''
+  /review_rating/votes/:
+    get:
+      operationId: review_rating_votes_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vote'
+          description: ''
+    post:
+      operationId: review_rating_votes_create
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vote'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+          description: ''
+  /review_rating/votes/{id}/:
+    get:
+      operationId: review_rating_votes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this vote.
+        required: true
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+          description: ''
+    put:
+      operationId: review_rating_votes_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this vote.
+        required: true
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Vote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Vote'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+          description: ''
+    patch:
+      operationId: review_rating_votes_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this vote.
+        required: true
+      tags:
+      - review_rating
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVote'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVote'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVote'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+          description: ''
+    delete:
+      operationId: review_rating_votes_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this vote.
+        required: true
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /review_rating/votes/reviews-liked-by-user/:
+    get:
+      operationId: review_rating_votes_reviews_liked_by_user_list
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: string
+        description: The user ID (UUID).
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: username
+        schema:
+          type: string
+        description: The username of the user.
+      tags:
+      - review_rating
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+  /user_management/notifications/:
+    get:
+      operationId: user_management_notifications_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+          description: ''
+    post:
+      operationId: user_management_notifications_create
+      tags:
+      - user_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Notification'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /user_management/notifications/{id}/:
+    get:
+      operationId: user_management_notifications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this notifications.
+        required: true
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+    put:
+      operationId: user_management_notifications_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this notifications.
+        required: true
+      tags:
+      - user_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Notification'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+    patch:
+      operationId: user_management_notifications_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this notifications.
+        required: true
+      tags:
+      - user_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNotification'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+    delete:
+      operationId: user_management_notifications_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this notifications.
+        required: true
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /user_management/users/:
+    get:
+      operationId: user_management_users_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+    post:
+      operationId: user_management_users_create
+      tags:
+      - user_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /user_management/users/{id}/:
+    get:
+      operationId: user_management_users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: user_management_users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - user_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: user_management_users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - user_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: user_management_users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /user_management/users/{id}/update-password/:
+    post:
+      operationId: user_management_users_update_password_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this user.
+        required: true
+      tags:
+      - user_management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /user_management/users/active-users/:
+    get:
+      operationId: user_management_users_active_users_retrieve
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /user_management/users/fetch-by-username/:
+    get:
+      operationId: user_management_users_fetch_by_username_retrieve
+      parameters:
+      - in: query
+        name: username
+        schema:
+          type: string
+        description: The username of the user you want to fetch.
+        required: true
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+  /user_management/users/inactive-users/:
+    get:
+      operationId: user_management_users_inactive_users_retrieve
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /user_management/users/me/:
+    get:
+      operationId: user_management_users_me_retrieve
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /user_management/users/total-users/:
+    get:
+      operationId: user_management_users_total_users_retrieve
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /user_management/users/user-review-count/:
+    get:
+      operationId: user_management_users_user_review_count_retrieve
+      parameters:
+      - in: query
+        name: user_id
+        schema:
+          type: string
+        description: The ID of the user whose reviews you want to count.
+        required: true
+      tags:
+      - user_management
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+                description: Unspecified response body
+          description: ''
+components:
+  schemas:
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        content_type:
+          type: string
+          readOnly: true
+        user:
+          type: string
+          readOnly: true
+        action_time:
+          type: string
+          format: date-time
+          readOnly: true
+        action_type:
+          type: string
+          maxLength: 50
+        object_id:
+          type: string
+          maxLength: 50
+        changes:
+          type: string
+          nullable: true
+        ip_address:
+          type: string
+          nullable: true
+        user_agent:
+          type: string
+          nullable: true
+      required:
+      - action_time
+      - action_type
+      - content_type
+      - id
+      - object_id
+      - user
+    Business:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        average_rating:
+          type: string
+          readOnly: true
+        total_reviews:
+          type: string
+          readOnly: true
+        business_image_url:
+          type: string
+          readOnly: true
+        business_image:
+          type: string
+          format: uri
+          nullable: true
+        business_name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        website_url:
+          type: string
+          nullable: true
+          maxLength: 50
+        average_rank:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        business_category:
+          type: string
+          format: uuid
+          nullable: true
+        business_owner:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+      - average_rank
+      - average_rating
+      - business_image_url
+      - business_name
+      - business_owner
+      - created_at
+      - description
+      - id
+      - total_reviews
+      - updated_at
+    BusinessCreate:
+      type: object
+      properties:
+        business_image:
+          type: string
+          format: uri
+          nullable: true
+        business_owner:
+          type: string
+          format: uuid
+        business_name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        website_url:
+          type: string
+          nullable: true
+          maxLength: 50
+        business_category:
+          type: string
+          format: uuid
+          nullable: true
+      required:
+      - business_name
+      - business_owner
+      - description
+    BusinessUpdate:
+      type: object
+      properties:
+        business_image:
+          type: string
+          format: uri
+          nullable: true
+        business_owner:
+          type: string
+          format: uuid
+        business_name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        website_url:
+          type: string
+          nullable: true
+          maxLength: 50
+      required:
+      - business_name
+      - business_owner
+      - description
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        category_name:
+          type: string
+          maxLength: 256
+        category_image:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - category_name
+      - id
+    FeatureRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        user:
+          type: string
+          format: uuid
+      required:
+      - description
+      - id
+      - user
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        is_read:
+          type: boolean
+        notofication_text:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_notifications:
+          type: string
+          format: uuid
+      required:
+      - created_at
+      - id
+      - notofication_text
+      - user_notifications
+    PatchedBusinessUpdate:
+      type: object
+      properties:
+        business_image:
+          type: string
+          format: uri
+          nullable: true
+        business_owner:
+          type: string
+          format: uuid
+        business_name:
+          type: string
+          maxLength: 100
+        description:
+          type: string
+        website_url:
+          type: string
+          nullable: true
+          maxLength: 50
+    PatchedCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        category_name:
+          type: string
+          maxLength: 256
+        category_image:
+          type: string
+          format: uri
+          nullable: true
+    PatchedFeatureRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        user:
+          type: string
+          format: uuid
+    PatchedNotification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        is_read:
+          type: boolean
+        notofication_text:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user_notifications:
+          type: string
+          format: uuid
+    PatchedReports:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        reason_select:
+          $ref: '#/components/schemas/ReasonSelectEnum'
+        result_report:
+          $ref: '#/components/schemas/ResultReportEnum'
+        reason:
+          type: string
+        create_at:
+          type: string
+          format: date-time
+          readOnly: true
+        review_id:
+          type: string
+          format: uuid
+        review_user_id:
+          type: string
+          format: uuid
+    PatchedReview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        rank:
+          allOf:
+          - $ref: '#/components/schemas/RankEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+        review_text:
+          type: string
+        hidden:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        business_id:
+          type: string
+          format: uuid
+    PatchedReviewResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        review:
+          type: string
+          format: uuid
+    PatchedSubscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        start_date:
+          type: string
+          format: date-time
+          readOnly: true
+        end_date:
+          type: string
+          format: date-time
+        is_active:
+          type: boolean
+        business:
+          type: string
+          format: uuid
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 30
+        username:
+          type: string
+          description: Ehsan
+          maxLength: 50
+        user_image:
+          type: string
+          format: uri
+          nullable: true
+        first_name:
+          type: string
+          nullable: true
+          description: First Name
+          maxLength: 50
+        last_name:
+          type: string
+          nullable: true
+          description: Last Name
+          maxLength: 50
+        password:
+          type: string
+          writeOnly: true
+        is_active:
+          type: boolean
+        is_admin:
+          type: boolean
+        hidden:
+          type: boolean
+        is_superuser:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedVote:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        review:
+          type: string
+          format: uuid
+    RankEnum:
+      enum:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      type: integer
+      description: |-
+        * `1` - Very Poor
+        * `2` - Poor
+        * `3` - Medium
+        * `4` - Good
+        * `5` - Very Good
+    ReasonSelectEnum:
+      enum:
+      - sexual
+      - violence
+      - accusations
+      - terrorism
+      type: string
+      description: |-
+        * `sexual` - SEXUAL
+        * `violence` - VIOLENCE
+        * `accusations` - ACCUSATIONS
+        * `terrorism` - TERRORISM
+    Reports:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        reason_select:
+          $ref: '#/components/schemas/ReasonSelectEnum'
+        result_report:
+          $ref: '#/components/schemas/ResultReportEnum'
+        reason:
+          type: string
+        create_at:
+          type: string
+          format: date-time
+          readOnly: true
+        review_id:
+          type: string
+          format: uuid
+        review_user_id:
+          type: string
+          format: uuid
+      required:
+      - create_at
+      - id
+      - reason
+      - reason_select
+      - review_id
+      - review_user_id
+    ResultReportEnum:
+      enum:
+      - ignore
+      - Unchecked
+      - Remove
+      - UserBan
+      type: string
+      description: |-
+        * `ignore` - Ignore
+        * `Unchecked` - Unchecked
+        * `Remove` - Remove
+        * `UserBan` - User_Ban
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        rank:
+          allOf:
+          - $ref: '#/components/schemas/RankEnum'
+          minimum: -2147483648
+          maximum: 2147483647
+        review_text:
+          type: string
+        hidden:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        business_id:
+          type: string
+          format: uuid
+      required:
+      - business_id
+      - created_at
+      - id
+      - review_text
+      - updated_at
+      - user
+    ReviewResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        review:
+          type: string
+          format: uuid
+      required:
+      - created_at
+      - description
+      - id
+      - review
+    StatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - PENDING
+        * `approved` - APPROVED
+        * `rejected` - REJECTED
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        start_date:
+          type: string
+          format: date-time
+          readOnly: true
+        end_date:
+          type: string
+          format: date-time
+        is_active:
+          type: boolean
+        business:
+          type: string
+          format: uuid
+      required:
+      - business
+      - end_date
+      - id
+      - start_date
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    TypeEnum:
+      enum:
+      - free
+      - premium
+      type: string
+      description: |-
+        * `free` - FREE
+        * `premium` - PREMIUM
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 30
+        username:
+          type: string
+          description: Ehsan
+          maxLength: 50
+        user_image:
+          type: string
+          format: uri
+          nullable: true
+        first_name:
+          type: string
+          nullable: true
+          description: First Name
+          maxLength: 50
+        last_name:
+          type: string
+          nullable: true
+          description: Last Name
+          maxLength: 50
+        password:
+          type: string
+          writeOnly: true
+        is_active:
+          type: boolean
+        is_admin:
+          type: boolean
+        hidden:
+          type: boolean
+        is_superuser:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - id
+      - username
+    Vote:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+        review:
+          type: string
+          format: uuid
+      required:
+      - created_at
+      - id
+      - review
+      - user
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
