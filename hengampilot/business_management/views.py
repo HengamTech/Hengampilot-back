@@ -19,30 +19,28 @@ from review_rating.serializers import ReviewSerializer
 from .tasks import manage_subscription
 
 
-# ViewSet for managing Business operations (CRUD)
 class BusinessViewSet(viewsets.ModelViewSet):
-    queryset = Business.objects.all()  # Get all Business records
+    queryset = Business.objects.all() 
     serializer_class = (
-        BusinessSerializer  # Default serializer class for the Business model
+        BusinessSerializer  
     )
-    permission_classes = [IsAuthenticated]  # Only authenticated users can access
+    permission_classes = [IsAuthenticated]  
     filter_backends = [
-        DjangoFilterBackend,  # Backend for filtering
-        filters.SearchFilter,  # Backend for search functionality
-        filters.OrderingFilter,  # Backend for ordering results
+        DjangoFilterBackend,  
+        filters.SearchFilter,  
+        filters.OrderingFilter,  
     ]
-    search_fields = ["business_name", "description"]  # Fields to be searchable
+    search_fields = ["business_name", "description"]  
     ordering_fields = [
         "created_at",
         "average_rank",
-    ]  # Fields by which the results can be ordered
-    
+    ]  
+
     def get_permissions(self):
         if self.action in ["list", "retrieve", "categories"]:
-            return [AllowAny()]  # Allow any user to access these actions
+            return [AllowAny()]  
         return [IsAuthenticated()]
 
-    # Dynamically return the appropriate serializer class based on the action
     def get_serializer_class(self):
         if self.action == "create":
             return BusinessCreateSerializer
@@ -50,7 +48,6 @@ class BusinessViewSet(viewsets.ModelViewSet):
             return BusinessUpdateSerializer
         return BusinessSerializer
 
-    # Override the perform_create method to set the business_owner as the current user
     def perform_create(self, serializer):
         serializer.save(business_owner=self.request.user, average_rank=0)
 
@@ -84,8 +81,8 @@ class BusinessViewSet(viewsets.ModelViewSet):
         ],
         responses={
             200: ReviewSerializer(many=True),
-            400: OpenApiParameter,  # پیام خطا در صورت ورود اشتباه
-            404: OpenApiParameter,  # پیام خطا در صورت عدم وجود شرکت
+            400: OpenApiParameter, 
+            404: OpenApiParameter,  
         },
     )
     @action(
@@ -114,7 +111,50 @@ class BusinessViewSet(viewsets.ModelViewSet):
 
         reviews = Review.objects.filter(business_id=business)
         serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="category_name",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Name of the category to retrieve business for.",
+                required=False,
+            ),
+        ],
+        responses={
+            200: OpenApiParameter,
+            400: OpenApiParameter,  
+            404: OpenApiParameter,  
+        },
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[AllowAny],
+        url_path="category-businesses",
+    )
+    def get_businesses_by_category(self, request):
+        category_name = request.query_params.get("category_name", None)
+
+        if not category_name:
+            return Response(
+                {"error": "Please provide a category name as a query parameter."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            #category = Category.objects.get(category_name=category_name)
+            category = Category.objects.filter(category_name__iexact=category_name).first()
+        except Category.DoesNotExist:
+            return Response(
+                {"error": "Category not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        businesses = Business.objects.filter(business_category=category)
+        serializer = BusinessSerializer(businesses, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -148,7 +188,7 @@ class SubscriptionVeiw(viewsets.ModelViewSet):
 class CategoryView(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    #permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
