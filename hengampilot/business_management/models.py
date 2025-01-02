@@ -16,19 +16,17 @@ class Business(models.Model):
     business_owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name="business_owner",  
+        related_name="business_owner",
         null=False,
         blank=False,
     )
-    business_image = models.ImageField(upload_to="business_images/", null=True, blank=True)
-
-
+    business_image = models.ImageField(
+        upload_to="business_images/", null=True, blank=True
+    )
     business_name = models.CharField(max_length=100, null=False, blank=False)
     description = models.TextField(null=False, blank=False)
     website_url = models.CharField(max_length=50, null=True, blank=True)
-
     average_rank = models.IntegerField()
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -54,7 +52,6 @@ class Subscription(models.Model):
         Business, on_delete=models.CASCADE, related_name="subscriptions"
     )
 
-
     type = models.CharField(
         max_length=20,
         choices=[(tag.value, tag.name) for tag in SubscriptionType],
@@ -75,6 +72,9 @@ class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     category_name = models.CharField(max_length=256)
+    category_image = models.ImageField(
+        upload_to="category_image/", null=True, blank=True
+    )
 
     def clean(self):
         if not self.category_name:

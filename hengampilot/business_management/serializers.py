@@ -43,11 +43,11 @@ class BusinessCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
         fields = (
-            "business_image",  # Image of the business
-            "business_owner",  # Owner of the business
-            "business_name",  # Name of the business
-            "description",  # Business description
-            "website_url",  # Optional website URL
+            "business_image",
+            "business_owner",
+            "business_name",
+            "description",
+            "website_url",
             "business_category",
         )
 
