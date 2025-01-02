@@ -94,7 +94,7 @@ class Subscription(models.Model):
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    category_name = models.CharField(max_length=256)
+    category_name = models.CharField(max_length=256,unique=True)
     category_image = models.ImageField(
         upload_to="category_image/",
         validators=[validate_image_size, validate_image_dimensions],

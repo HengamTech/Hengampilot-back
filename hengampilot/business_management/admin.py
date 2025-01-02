@@ -25,6 +25,7 @@ class BusinessAdmin(admin.ModelAdmin):
         "business_name",
         "website_url",
         "average_rank",
+        "business_category",
         "created_at",
         "updated_at",
     ]
@@ -37,6 +38,7 @@ class BusinessAdmin(admin.ModelAdmin):
 
     # Filters that can be applied in the admin panel to sort or narrow down the list
     list_filter = [
+        "business_category",
         "created_at",
         "updated_at",
     ]

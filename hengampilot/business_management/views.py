@@ -36,7 +36,7 @@ class BusinessViewSet(viewsets.ModelViewSet):
         "created_at",
         "average_rank",
     ]  # Fields by which the results can be ordered
-    
+
     def get_permissions(self):
         if self.action in ["list", "retrieve", "categories"]:
             return [AllowAny()]  # Allow any user to access these actions
@@ -114,7 +114,49 @@ class BusinessViewSet(viewsets.ModelViewSet):
 
         reviews = Review.objects.filter(business_id=business)
         serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="category_name",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description="Name of the category to retrieve business for.",
+                required=False,
+            ),
+        ],
+        responses={
+            200: OpenApiParameter,
+            400: OpenApiParameter,  # پیام خطا در صورت ورود اشتباه
+            404: OpenApiParameter,  # پیام خطا در صورت عدم وجود شرکت
+        },
+    )
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[AllowAny],
+        url_path="category-businesses",
+    )
+    def get_businesses_by_category(self, request):
+        category_name = request.query_params.get("category_name", None)
+
+        if not category_name:
+            return Response(
+                {"error": "Please provide a category name as a query parameter."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            category = Category.objects.get(category_name=category_name)
+        except Category.DoesNotExist:
+            return Response(
+                {"error": "Category not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        businesses = Business.objects.filter(business_category=category)
+        serializer = BusinessSerializer(businesses, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -148,7 +190,7 @@ class SubscriptionVeiw(viewsets.ModelViewSet):
 class CategoryView(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    #permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
