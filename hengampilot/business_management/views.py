@@ -36,7 +36,7 @@ class BusinessViewSet(viewsets.ModelViewSet):
         "created_at",
         "average_rank",
     ]  # Fields by which the results can be ordered
-
+    
     def get_permissions(self):
         if self.action in ["list", "retrieve", "categories"]:
             return [AllowAny()]  # Allow any user to access these actions
@@ -44,13 +44,10 @@ class BusinessViewSet(viewsets.ModelViewSet):
 
     # Dynamically return the appropriate serializer class based on the action
     def get_serializer_class(self):
-        # Use the BusinessCreateSerializer for the create action
         if self.action == "create":
             return BusinessCreateSerializer
-        # Use the BusinessUpdateSerializer for update or partial_update actions
         elif self.action in ["update", "partial_update"]:
             return BusinessUpdateSerializer
-        # Use the default BusinessSerializer for other actions
         return BusinessSerializer
 
     # Override the perform_create method to set the business_owner as the current user
