@@ -40,8 +40,9 @@ class Business(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name="business_owner",
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
+        
     )
     business_image = models.ImageField(
         upload_to="business_images/",
