@@ -34,7 +34,7 @@ class BusinessSerializer(serializers.ModelSerializer):
     # Generate the full URL for the business image
     def get_business_image_url(self, obj):
         request = self.context.get("request")
-        if obj.business_image:
+        if request and obj.business_image:
             return request.build_absolute_uri(obj.business_image.url)
         return None
 
@@ -43,11 +43,11 @@ class BusinessCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
         fields = (
-            "business_image",
-            "business_owner",
-            "business_name",
-            "description",
-            "website_url",
+            "business_image",  
+            "business_owner",  
+            "business_name",  
+            "description", 
+            "website_url",  # Optional website URL
             "business_category",
         )
 
