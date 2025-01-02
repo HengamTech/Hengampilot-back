@@ -8,33 +8,9 @@ from django.contrib.auth.models import (
 )
 from django.core.files.images import get_image_dimensions
 from django.core.exceptions import ValidationError
-
 from .managers import UserMnagers
 
-
-# class UserMnagers(BaseUserManager):
-#     def create_user(self, username, email, password=None, **extra_fields):
-#         """
-#         Creates and saves a User with the given username, email, and password.
-#         """
-#         if not email:
-#             raise ValueError("The Email field must be set")
-#         email = self.normalize_email(email)
-#         user = self.model(username=username, email=email, **extra_fields)
-#         user.set_password(password)
-#         user.save(using=self._db)
-#         return user
-
-#     def create_superuser(self, username, email, password=None, **extra_fields):
-
-#         extra_fields.setdefault("is_superuser", True)
-#         extra_fields.setdefault("is_staff", True)
-#         return self.create_user(username, email, password, **extra_fields)
-
-
 # Custom User model that extends AbstractBaseUser and PermissionsMixin
-
-
 def validate_image_dimensions(image):
     max_width = 1920  # Maximum width
     max_height = 1080  # Maximum height
@@ -45,7 +21,6 @@ def validate_image_dimensions(image):
         raise ValidationError(
             f"Image dimensions must not exceed {max_width}x{max_height} pixels."
         )
-
 
 def validate_image_size(image):
     max_size = 5 * 1024 * 1024  # Maximum size = 5MB
@@ -75,11 +50,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     is_superuser = models.BooleanField(default=False)
-
-    # @property
-    # def is_staff(self):
-    #     return self.is_admin Cuz it was pre defined and certain by super user admin!!
-    # Add is_staff as a field instead of a property
     is_staff = models.BooleanField(default=False)
     objects = UserMnagers()
     USERNAME_FIELD = "username"
