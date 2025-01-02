@@ -52,6 +52,7 @@ def validate_image_size(image):
     if image.size > max_size:
         raise ValidationError("Image size must be 5MB or fewer.")
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=30, unique=True)
