@@ -5,6 +5,7 @@ from enum import Enum
 from django.core.exceptions import ValidationError
 from django.core.files.images import get_image_dimensions
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 
 def validate_image_dimensions(image):
@@ -12,6 +13,8 @@ def validate_image_dimensions(image):
     max_height = 1080  # Maximum height
 
     width, height = get_image_dimensions(image)
+    if width is None or height is None:
+        raise ValidationError("Unable to determine image dimensions.")
 
     if width > max_width or height > max_height:
         raise ValidationError(
@@ -89,12 +92,16 @@ class Subscription(models.Model):
     def __str__(self):
         return f"{self.business.business_name} - {self.type}"
 
+    def clean(self):
+        if self.end_date < timezone.now():
+            raise ValidationError("End date cannot be in the past.")
+
 
 # Model representing a category of businesses
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
-    category_name = models.CharField(max_length=256,unique=True)
+    category_name = models.CharField(max_length=256, unique=True)
     category_image = models.ImageField(
         upload_to="category_image/",
         validators=[validate_image_size, validate_image_dimensions],
