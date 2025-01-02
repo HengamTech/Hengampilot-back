@@ -1,13 +1,29 @@
 from django.contrib.auth.models import BaseUserManager
 
 class UserMnagers(BaseUserManager):
-    def create_user(self, username, email, password=None, **extra_fields):
+
+    # Method to create a regular user
+    def create_user(self, email, username, password, is_active):
         if not email:
-            raise ValueError('The Email field must be set')
-        email = self.normalize_email(email)
-        user = self.model(username=username, email=email, **extra_fields)
+            raise ValueError("Users must have an email address")
+
+        if not username:
+            raise ValueError("Users must have a username")
+
+        if not password:
+            raise ValueError("Users must have a password")
+
+        user = self.model(
+            username=username,
+            email=self.normalize_email(email),  # Normalize the email to lowercase
+        )
+
         user.set_password(password)
+
+        user.is_active = is_active
+
         user.save(using=self._db)
+
         return user
 
     def create_superuser(self, username, email, password=None, **extra_fields):

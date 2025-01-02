@@ -19,6 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "username",
+            "user_image",
             "first_name",
             "last_name",
             "password",
@@ -39,6 +40,8 @@ class UserSerializer(serializers.ModelSerializer):
             first_name=validated_data.get("first_name", ""),
             last_name=validated_data.get("last_name", ""),
         )
+        if "user_image" in validated_data:
+            user.user_image = validated_data["user_image"]
         return user
 
     def update(self, instance, validated_data):
@@ -47,12 +50,12 @@ class UserSerializer(serializers.ModelSerializer):
         instance.first_name = validated_data.get("first_name", instance.first_name)
         instance.last_name = validated_data.get("last_name", instance.last_name)
         instance.is_active = validated_data.get("is_active", instance.is_active)
-
+        if "user_image" in validated_data:
+            instance.user_image = validated_data["user_image"]
         # Check and update password if provided
         password = validated_data.get("password", None)
         if password:
             instance.set_password(password)  # Hash the password
-
         instance.save()
         return instance
 
