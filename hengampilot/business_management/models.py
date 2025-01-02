@@ -61,6 +61,8 @@ class Subscription(models.Model):
     business = models.ForeignKey(
         Business, on_delete=models.CASCADE, related_name="subscriptions"
     )
+    business_image = models.ImageField(upload_to="business_images/", null=True, blank=True)
+
 
     # The type of subscription (either FREE or PREMIUM), using choices from SubscriptionType enum
     type = models.CharField(

@@ -45,6 +45,7 @@ class BusinessCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
         fields = (
+            "business_image",
             "business_owner",  # Owner of the business (should be provided by the user)
             "business_name",  # Name of the business
             "description",  # Description of the business
@@ -58,6 +59,7 @@ class BusinessUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
         fields = (
+            "business_image",
             "business_owner",  # Owner of the business (can be updated if necessary)
             "business_name",  # Name of the business (can be updated)
             "description",  # Description of the business (can be updated)
