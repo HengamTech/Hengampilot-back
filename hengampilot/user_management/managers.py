@@ -17,13 +17,9 @@ class UserMnagers(BaseUserManager):
             username=username,
             email=self.normalize_email(email),  # Normalize the email to lowercase
         )
-
         user.set_password(password)
-
         user.is_active = is_active
-
         user.save(using=self._db)
-
         return user
 
     def create_superuser(self, username, email, password=None, **extra_fields):
