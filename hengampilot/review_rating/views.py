@@ -11,6 +11,7 @@ from .serializers import (
 )
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permission import AllowAnyGet
 from .tasks import add_review_view, add_report_view
 from user_management.models import User
 from django.utils import timezone 
@@ -23,36 +24,30 @@ class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     # Specify the serializer to be used
     serializer_class = ReviewSerializer
-    # Set permission class to ensure only authenticated users can access the viewset
-    # permission_classes = [IsAuthenticated]
+    # Set permission class to ensure all (whether authenticated users or not) can access the viewset
+    permission_classes = [AllowAnyGet]
 
-    def get_permissions(self):
-        if self.action in ["list", "retrieve", "view_reviews"]:
-            return [AllowAny()]
-        return [IsAuthenticated()]
-
-    @action(
-        detail=False,
-        methods=["get"],
-        permission_classes=[AllowAny],
-        url_path="view_reviews",
-    )
+    # def get_permissions(self):
+    #     if self.action in ["list", "retrieve", "view_reviews"]:
+    #         return [AllowAny()]
+    #     return [IsAuthenticated()]
+    @action(detail=False,methods=["get"], url_path="view_reviews")
     def view_reviews(self, request):
         reviews = Review.objects.all()
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
     
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path='count-all-reviews') 
+    @action(detail=False, methods=["get"], url_path='count-all-reviews') 
     def count_all_reviews(self, request): 
         count = Review.objects.count() 
         return Response({'count': count}, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path='count-unapproved-reviews') 
+    @action(detail=False, methods=["get"], url_path='count-unapproved-reviews') 
     def count_unapproved_reviews(self, request): 
         count = Review.objects.filter(approved=False).count() 
         return Response({'count': count}, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path='waiting-approval-reviews') 
+    @action(detail=False, methods=["get"], url_path='waiting-approval-reviews') 
     def waiting_approval_reviews(self, request): 
         period = request.query_params.get('period', 'day') 
         if period == 'day': since = timezone.now() - timedelta(days=1) 
@@ -119,7 +114,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 {"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
-    @action(detail=False, methods=["get"], permission_classes=[AllowAny], url_path='average-rating') 
+    @action(detail=False, methods=["get"], url_path='average-rating') 
     def average_rating(self, request): 
         average = Review.objects.aggregate(Avg('rank'))['rank__avg'] 
         return Response({'average_rating': average}, status=status.HTTP_200_OK)
@@ -131,7 +126,7 @@ class VoteViewSet(viewsets.ModelViewSet):
     # Specify the serializer to be used
     serializer_class = VoteSerializer
     # Set permission class to ensure only authenticated users can access the viewset
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAnyGet]
 
     @extend_schema(
         parameters=[
@@ -184,7 +179,7 @@ class ReportsViewSet(viewsets.ModelViewSet):
     # Specify the serializer to be used
     serializer_class = ReportsSerializer
     # Set permission class to ensure only authenticated users can access the viewset
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAnyGet]
 
     # Custom action for adding a report (this triggers a background task)
     @action(detail=False, methods=["post"])
@@ -207,4 +202,4 @@ class ReviewResponseViewSet(viewsets.ModelViewSet):
     # Specify the serializer to be used
     serializer_class = ReviewResponseSerializer
     # Set permission class to ensure only authenticated users can access the viewset
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAnyGet]

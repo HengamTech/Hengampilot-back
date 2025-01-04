@@ -5,7 +5,6 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Business, Subscription, Category
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-
 from .serializers import (
     BusinessSerializer,
     BusinessCreateSerializer,
@@ -13,18 +12,15 @@ from .serializers import (
     SubscriptionSerializer,
     CategorySerializer,  # doesn't exists
 )
-
 from review_rating.models import Review
 from review_rating.serializers import ReviewSerializer
 from .tasks import manage_subscription
-
+from .permission import AllowAnyGet
 
 class BusinessViewSet(viewsets.ModelViewSet):
     queryset = Business.objects.all() 
-    serializer_class = (
-        BusinessSerializer  
-    )
-    permission_classes = [IsAuthenticated]  
+    serializer_class = (BusinessSerializer)
+    permission_classes = [AllowAnyGet]  
     filter_backends = [
         DjangoFilterBackend,  
         filters.SearchFilter,  
@@ -36,11 +32,6 @@ class BusinessViewSet(viewsets.ModelViewSet):
         "average_rank",
     ]  
 
-    def get_permissions(self):
-        if self.action in ["list", "retrieve", "categories"]:
-            return [AllowAny()]  
-        return [IsAuthenticated()]
-
     def get_serializer_class(self):
         if self.action == "create":
             return BusinessCreateSerializer
@@ -51,12 +42,7 @@ class BusinessViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(business_owner=self.request.user, average_rank=0)
 
-    @action(
-        detail=False,
-        methods=["get"],
-        permission_classes=[AllowAny],
-        url_path="categories",
-    )
+    @action(detail=False,methods=["get"],url_path="categories")
     def list_categories(self, request):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
@@ -85,9 +71,7 @@ class BusinessViewSet(viewsets.ModelViewSet):
             404: OpenApiParameter,  
         },
     )
-    @action(
-        detail=False, methods=["get"], permission_classes=[AllowAny], url_path="reviews"
-    )
+    @action(detail=False, methods=["get"], url_path="reviews")
     def get_reviews(self, request):
         business_name = request.query_params.get("name", None)
         business_id = request.query_params.get("id", None)
@@ -129,12 +113,7 @@ class BusinessViewSet(viewsets.ModelViewSet):
             404: OpenApiParameter,  
         },
     )
-    @action(
-        detail=False,
-        methods=["get"],
-        permission_classes=[AllowAny],
-        url_path="category-businesses",
-    )
+    @action(detail=False,methods=["get"],url_path="category-businesses",)
     def get_businesses_by_category(self, request):
         category_name = request.query_params.get("category_name", None)
 
@@ -164,7 +143,7 @@ class SubscriptionVeiw(viewsets.ModelViewSet):
     serializer_class = (
         SubscriptionSerializer  # Default serializer class for the Subscription model
     )
-    permission_classes = [IsAuthenticated]  # Only authenticated users can access
+    permission_classes = [AllowAnyGet]  # Only authenticated users can access
 
     # Custom action to manage a subscription (activate, deactivate, change type)
     @action(detail=True, methods=["post"])
@@ -188,9 +167,4 @@ class SubscriptionVeiw(viewsets.ModelViewSet):
 class CategoryView(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    # permission_classes = [IsAuthenticated]
-
-    def get_permissions(self):
-        if self.action in ["list", "retrieve"]:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    permission_classes = [AllowAnyGet]

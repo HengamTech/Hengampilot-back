@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from .permission import AllowAnyGet
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import User, Notifications
@@ -11,12 +12,7 @@ from review_rating.models import Review
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_permissions(self):
-        if self.action == "create":
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    permission_classes = [AllowAnyGet]
 
     @extend_schema(
         parameters=[
@@ -39,6 +35,8 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def me(self, request):
+        if not request.user.is_authenticated: # for GET email must auth!
+            return Response({"detail": "Authentication credentials were not provided for user Email."}, status=status.HTTP_401_UNAUTHORIZED)
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
@@ -52,15 +50,15 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         return Response({"detail": "Password updated successfully"}, status=status.HTTP_200_OK)
     
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="total-users") 
+    @action(detail=False, methods=["get"], url_path="total-users") 
     def total_users(self, request): 
         count = User.objects.count() 
         return Response({"total_users": count}, status=status.HTTP_200_OK) 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="active-users") 
+    @action(detail=False, methods=["get"], url_path="active-users") 
     def active_users(self, request): 
         count = User.objects.filter(is_active=True).count() 
         return Response({"active_users": count}, status=status.HTTP_200_OK) 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="inactive-users") 
+    @action(detail=False, methods=["get"], url_path="inactive-users") 
     def inactive_users(self, request): 
         count = User.objects.filter(is_active=False).count() 
         return Response({"inactive_users": count}, status=status.HTTP_200_OK)
@@ -70,7 +68,7 @@ class UserViewSet(viewsets.ModelViewSet):
             OpenApiParameter('user_id', str, description='The ID of the user whose reviews you want to count.', required=True)
               ], 
               responses={200: "Review count"} ) 
-    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated], url_path="user-review-count") 
+    @action(detail=False, methods=["get"], url_path="user-review-count") 
     def user_review_count(self, request): 
         user_id = request.query_params.get('user_id', None) 
         if user_id: 
@@ -86,14 +84,8 @@ class UserViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notifications.objects.all()
     serializer_class = NotificationSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAnyGet]
 
     def get_queryset(self):
         return self.queryset.filter(user_notifications=self.request.user)
 
-    # @action(detail=True, methods=['post'])
-    # def mark_as_read(self, request, pk=None):
-    #     notification = self.get_object()
-    #     notification.is_read = True
-    #     notification.save()
-    #     return Response({'status': 'notification marked as read'})
