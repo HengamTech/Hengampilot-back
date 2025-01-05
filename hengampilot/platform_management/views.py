@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import FeatureRequest
 from .serializers import FeatureRequestSerializer
-from rest_framework.permissions import IsAuthenticated
+from .permission import AllowAnyGet
 
 # ViewSet for FeatureRequest model
 class FeatureRequestViewSet(viewsets.ModelViewSet):
@@ -13,4 +13,4 @@ class FeatureRequestViewSet(viewsets.ModelViewSet):
     serializer_class = FeatureRequestSerializer
     
     # Restrict access to authenticated users only
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAnyGet]
