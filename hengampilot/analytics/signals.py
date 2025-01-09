@@ -1,6 +1,9 @@
+import logging
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .middleware import log_action
+
+logger = logging.getLogger(__name__)
 
 # Signal receiver function to log model changes (creation, update, and deletion)
 @receiver([post_save, post_delete])  # Connect the signal to both post_save and post_delete signals
@@ -17,7 +20,5 @@ def log_model_change(sender, instance, **kwargs):
         
         # Retrieve the user who performed the action (stored in the instance's '_current_user' attribute)
         user = getattr(instance, '_current_user', None)  # _current_user is assumed to be set by middleware
-        
-        # If a user is found, log the action using the log_action function
-        if user:
-            log_action(user, action_type, instance)
+        logger.debug(f"Log model change: {action_type} for {instance} by {user}")
+        log_action(user, action_type, instance)
