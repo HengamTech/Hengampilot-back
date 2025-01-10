@@ -19,9 +19,9 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "email",
             "username",
-            "user_image",
             "first_name",
             "last_name",
+            "user_image",
             "password",
             "is_active",
             "is_admin",
@@ -29,7 +29,9 @@ class UserSerializer(serializers.ModelSerializer):
             "is_superuser",
             "created_at",
         )
-        extra_kwargs = {"password": {"write_only": True}}
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
 
     def create(self, validated_data):
         user = User.objects.create_user(
