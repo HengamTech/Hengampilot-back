@@ -1,5 +1,5 @@
 from rest_framework import viewsets, filters
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from .permission import IsStaffOrAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import AuditLog
 from .serializers import AuditLogSerializer
@@ -16,7 +16,7 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = AuditLogSerializer
 
     # Define the permissions required to access the viewset (admin or authenticated users)
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsStaffOrAdminUser]
 
     # Specify the filter backends used to filter and search the data
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]

@@ -1,11 +1,13 @@
 from django.utils.deprecation import MiddlewareMixin
 from django.contrib.contenttypes.models import ContentType
 from .models import AuditLog
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Create middleware for automatically logging actions
 class AuditLogMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        #print("ahha")
         # Add IP address and user agent data to the request object for use in logging
         request.audit_log_data = {
             'ip_address': request.META.get('REMOTE_ADDR'),  # Get IP address from request metadata
@@ -15,6 +17,7 @@ class AuditLogMiddleware(MiddlewareMixin):
         # Add the current authenticated user to the request
         if request.user.is_authenticated:
             setattr(request, '_current_user', request.user)
+            logger.debug(f"Set current user: {request.user}")
 
 # Helper function to log user actions into the AuditLog model
 def log_action(user, action_type, instance, changes=None):
@@ -23,7 +26,8 @@ def log_action(user, action_type, instance, changes=None):
     This function records details like the user, action type, model instance, changes, 
     IP address, and user agent for auditing purposes.
     """
-    # Create an AuditLog entry with the provided details
+    logger.debug(f"Logging action: {action_type} for {instance} by {user}")
+
     AuditLog.objects.create(
         user=user,  # The user who performed the action
         action_type=action_type,  # The type of action (e.g., 'create', 'update', 'delete')
