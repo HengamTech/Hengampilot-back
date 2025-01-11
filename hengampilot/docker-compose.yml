@@ -18,15 +18,15 @@ services:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/app
+      - .:/app  # Bind your local code to the container /app directory
     ports:
       - "8000:8000"
     depends_on:
       - postgres
     environment:
       - DEBUG=True
-      - DB_HOST=postgres
-      - DB_PORT=5432  # Changed to match default PostgreSQL port
+      - DB_HOST=postgres # Ensure DB_HOST is set to 'postgres'
+      - DB_PORT=5432
       - DB_NAME=postgres
       - DB_USER=username
       - DB_PASSWORD=1234
