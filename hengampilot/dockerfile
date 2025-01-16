@@ -3,17 +3,12 @@ FROM python:3.10-slim-buster
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    # Prevents Python from buffering stdout and stderr
     PYTHONFAULTHANDLER=1 \
-    # Keeps Python from generating .pyc files
-    PYTHONHASHSEED=random \
-    # Set a random seed for hash-based operations
     PIP_NO_CACHE_DIR=1 \
-    # Don't use pip cache
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    # Don't check for pip updates
     PIP_DEFAULT_TIMEOUT=100
 
+# Create a working directory
 WORKDIR /app
 
 # Install system dependencies
@@ -27,15 +22,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
-    # Remove backports.zoneinfo from requirements if Python >= 3.9
     sed -i '/backports.zoneinfo/d' requirements.txt && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy project files
+# Create scripts directory and copy entrypoint.sh
+RUN mkdir -p /scripts
+COPY entrypoint.sh /scripts/entrypoint.sh
+RUN chmod +x /scripts/entrypoint.sh
+
+# Copy project files to /app
 COPY . .
+
+# Expose application port (Django default is 8000)
 EXPOSE 8000
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
 
 # Set the entrypoint
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/scripts/entrypoint.sh"]
