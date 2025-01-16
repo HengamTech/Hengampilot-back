@@ -14,6 +14,20 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [AllowAnyGet]
 
+    def get_permissions(self):
+        if self.action == 'create':
+            return [AllowAny()]
+        return super().get_permissions()
+
+
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
     @extend_schema(
         parameters=[
             OpenApiParameter('username', str, description='The username of the user you want to fetch.', required=True)

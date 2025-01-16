@@ -6,10 +6,10 @@ from enum import Enum
 
 # Enum class to define the possible reasons for reporting a review.
 class ReasonReport(Enum):
-    SEXUAL = "sexual"  # Report reason for sexual content.
-    VIOLENCE = "violence"  # Report reason for violence.
-    ACCUSATIONS = "accusations"  # Report reason for accusations.
-    TERRORISM = "terrorism"  # Report reason for terrorism-related content.
+    SEXUAL = "sexual"  
+    VIOLENCE = "violence"  
+    ACCUSATIONS = "accusations"  
+    TERRORISM = "terrorism"  
 
 
 class ResultReport(Enum):
@@ -21,36 +21,35 @@ class ResultReport(Enum):
 
 # Model for a review on a business.
 class Review(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique identifier for the review.
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_review"
-    )  # User who posted the review.
+    )  
     business_id = models.ForeignKey(
         "business_management.Business",
         on_delete=models.CASCADE,
         related_name="review_business",
-    )  # The business being reviewed.
+    )  
     rank = models.IntegerField(
-        choices=[  # Rank choices for the review.
+        choices=[  
             (1, "Very Poor"),
             (2, "Poor"),
             (3, "Medium"),
             (4, "Good"),
             (5, "Very Good"),
         ],
-        default=3,  # Default rank is "Medium".
+        default=3,  
     )
-    review_text = models.TextField()  # The content of the review.
-    hidden = models.BooleanField(default=False)  # If the review is hidden or not.
+    review_text = models.TextField()  
+    hidden = models.BooleanField(default=False)  
     created_at = models.DateTimeField(
         auto_now_add=True
-    )  # Timestamp when the review was created.
+    ) 
     updated_at = models.DateTimeField(
         auto_now=True
-    )  # Timestamp when the review was last updated.
+    )  
 
     def __str__(self):
-        # String representation of the Review object (shows the user and business).
         return f"{self.user} - {self.business_id}"
 
 
