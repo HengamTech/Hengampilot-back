@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def log_model_change(sender, instance, **kwargs):
     # Check if the instance has a '_meta' attribute (to ensure it's a model instance)
     # And ensure the signal is not coming from the 'analytics' app (to avoid logging from this app)
-    if hasattr(instance, '_meta') and not sender._meta.app_label == 'analytics':
+    if hasattr(instance, '_meta') and sender._meta.app_label != 'analytics':
         
         # Determine the action type based on whether the instance was created or updated
         if 'created' in kwargs:

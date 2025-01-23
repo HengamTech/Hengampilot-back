@@ -3,7 +3,9 @@ from .permission import IsStaffOrAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import AuditLog
 from .serializers import AuditLogSerializer
+import logging
 
+logger = logging.getLogger(__name__)
 
 # ViewSet for handling read-only access to AuditLog data
 class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
@@ -22,7 +24,13 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
 
     # Define which fields the user can filter by (filterset fields)
-    filterset_fields = ["action_type", "content_type", "user"]
+    filterset_fields = ["action_type", "content_type", "user", "object_id"]
 
     # Define which fields the user can search by (search fields)
     search_fields = ["changes"]
+
+    def list(self, request, *args, **kwargs):
+            logger.debug(f"Query Params: {request.query_params}")
+            response = super().list(request, *args, **kwargs)
+            logger.debug(f"Response Data: {response.data}")
+            return response
