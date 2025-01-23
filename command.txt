@@ -13,6 +13,8 @@ coverage run  manage.py test review_rating.tests.views
 coverage run  manage.py test review_rating.tests.models 
 coverage run  manage.py test user_management.tests.models 
 coverage run  manage.py test user_management.tests.views 
+coverage run  manage.py test user_management.tests.managers 
+
 coverage run  manage.py test business_management.tests.views 
 coverage run  manage.py test business_management.tests.models 
 coverage run  manage.py test platform_management.tests.models 
