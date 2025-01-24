@@ -1,0 +1,23 @@
+
+[run]
+omit =
+
+    */settings.py
+    */wsgi.py
+    */asgi.py
+    */manage.py
+    */__init__.py
+    */tests/*
+    */user_management/managers.py
+
+[report]
+exclude_lines =
+    # Don't include the standard Django admin methods
+    @admin.register
+    @staticmethod
+    @classmethod
+    def __str__
+    def __repr__
+
+    # Don't include the `if DEBUG` blocks:
+    if settings.DEBUG
