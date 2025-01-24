@@ -16,7 +16,8 @@ class AuditLogMiddleware(MiddlewareMixin):
 
         # Add the current authenticated user to the request
         if request.user.is_authenticated:
-            setattr(request, '_current_user', request.user)
+            request._current_user = request.user
+            # setattr(request, '_current_user', request.user)
             logger.debug(f"Set current user: {request.user}")
 
 # Helper function to log user actions into the AuditLog model
@@ -34,6 +35,6 @@ def log_action(user, action_type, instance, changes=None):
         content_type=ContentType.objects.get_for_model(instance),  # Get the content type for the model instance
         object_id=str(instance.pk),  # ID of the affected object
         changes=changes,  # The changes made (if any)
-        ip_address=getattr(user, 'audit_log_data', {}).get('ip_address'),  # Get the IP address from the middleware
-        user_agent=getattr(user, 'audit_log_data', {}).get('user_agent'),  # Get the user agent from the middleware
+        ip_address= user.audit_log_data.get('ip_address') if user else None,# getattr(user, 'audit_log_data', {}).get('ip_address'),  # Get the IP address from the middleware
+        user_agent= user.audit_log_data.get('user_agent') if user else None,# getattr(user, 'audit_log_data', {}).get('user_agent'),  # Get the user agent from the middleware
     )
